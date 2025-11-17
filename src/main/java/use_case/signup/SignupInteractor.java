@@ -1,4 +1,14 @@
 package use_case.signup;
 
-public class SignupInteractor {
+import data_access.FileAccessDataObject;
+
+import java.io.IOException;
+
+public class SignupInteractor implements SignupInputBoundary{
+
+    public void execute(String username, String password) throws IOException {
+
+        FileAccessDataObject fileAccessDataObject = new FileAccessDataObject();
+        fileAccessDataObject.signup(username, password);
+    }
 }
