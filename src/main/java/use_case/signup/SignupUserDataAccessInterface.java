@@ -1,4 +1,8 @@
 package use_case.signup;
 
-public interface SignupUserDataAccessDatabase {
+import java.io.IOException;
+
+public interface SignupUserDataAccessInterface {
+
+    public void signup(String username, String password) throws IOException;
 }
