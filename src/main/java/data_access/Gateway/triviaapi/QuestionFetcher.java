@@ -1,5 +1,7 @@
 package data_access.Gateway.triviaapi;
 
+import entity.Question;
+
 import java.util.List;
 
 /**
@@ -15,7 +17,7 @@ public interface QuestionFetcher {
      * @return list of sub breeds for the given breed
      * @throws QuestionNotFoundException if the breed does not exist
      */
-    List<String> getQuestions(String category, String difficulty, String type, int numQuestions) throws QuestionNotFoundException;
+    List<Question> getQuestions(String category, String difficulty, String type, int numQuestions) throws QuestionNotFoundException;
 
     // a class defined in an interface is public AND static
             // extends RuntimeException

@@ -18,7 +18,8 @@ public class Player {
     public Player(String username, String password) {
         this.username = username;
         this.password = password;
-        this.points = 0;
+        // changed initial points/HP so that the player can play at least 1-2 questions before they die
+        this.points = 500;
     }
 
     public boolean checkCredentials() throws IOException {

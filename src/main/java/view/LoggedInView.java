@@ -9,6 +9,7 @@ import javax.swing.*;
 public class LoggedInView {
 
     private LoggedInViewModel loggedInViewModel;
+    private LoggedInController loggedInController;
 
     private final JFrame frame = new JFrame();
 
@@ -17,8 +18,9 @@ public class LoggedInView {
     private final JButton statsButton = new JButton("Stats");
     private final JButton logoutButton = new JButton("Logout");
 
-    public LoggedInView(LoggedInViewModel loggedInViewModel) {
+    public LoggedInView(LoggedInViewModel loggedInViewModel, LoggedInController loggedInController) {
         this.loggedInViewModel = loggedInViewModel;
+        this.loggedInController = loggedInController;
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -30,8 +32,6 @@ public class LoggedInView {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
         frame.pack();
-
-        LoggedInController loggedInController = new LoggedInController();
 
         //play button clicked
         playButton.addActionListener(e -> {
