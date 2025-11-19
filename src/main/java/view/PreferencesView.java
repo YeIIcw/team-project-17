@@ -8,6 +8,7 @@ import javax.swing.*;
 public class PreferencesView {
 
     private PreferencesViewModel preferencesViewModel;
+    private final PreferencesController preferencesController;
 
     private final JFrame frame = new JFrame();
 
@@ -32,8 +33,10 @@ public class PreferencesView {
 
     private final JButton doneButton = new JButton("Done");
 
-    public PreferencesView (PreferencesViewModel preferencesViewModel) {
+    public PreferencesView(PreferencesViewModel preferencesViewModel,
+                           PreferencesController preferencesController) {
         this.preferencesViewModel = preferencesViewModel;
+        this.preferencesController = preferencesController;
 
         JPanel category = new JPanel();
         category.add(categoryLabel);
@@ -75,8 +78,13 @@ public class PreferencesView {
                 String typeChoice =  (String) typesDropdown.getSelectedItem();
                 int numQuestionChoice =  Integer.parseInt((String)(numQuestionDropdown.getSelectedItem()));
 
-                PreferencesController preferencesController = new PreferencesController(categoryChoice, difficultyChoice, typeChoice, numQuestionChoice);
-                preferencesController.execute();
+                preferencesController.execute(
+                        categoryChoice,
+                        difficultyChoice,
+                        typeChoice,
+                        numQuestionChoice
+                );
+
                 frame.dispose();
             }
 
