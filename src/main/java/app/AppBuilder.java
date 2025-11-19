@@ -1,5 +1,6 @@
 package app;
 
+import data_access.FileAccessDataObject;
 import interface_adapter.Loggedin.LoggedInViewModel;
 import interface_adapter.Login.LoginViewModel;
 import interface_adapter.HomeScreen.HomeScreenViewModel;
@@ -10,6 +11,8 @@ import interface_adapter.Preferences.PreferencesViewModel;
 import view.*;
 
 public class AppBuilder {
+
+    final FileAccessDataObject questionDataAccessObject = new FileAccessDataObject("questions.csv");
 
     private HomeScreenView homeScreenView;
     private HomeScreenViewModel homeScreenViewModel;
