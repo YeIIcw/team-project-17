@@ -1,29 +1,11 @@
 package entity;
 
-public class Character {
-    private int health;
-    private int damage;
+public class Character extends Combatant {
     private int healing;
 
     public Character(int health, int damage, int healing) {
-        this.health = health;
-        this.damage = damage;
+        super(health, damage);
         this.healing = healing;
-    }
-
-    public int getHealth() {
-        return health;
-    }
-    public void setHealth(int health) {
-        this.health = health;
-    }
-
-    public int getDamage() {
-        return damage;
-    }
-
-    public void setDamage(int damage) {
-        this.damage = damage;
     }
 
     public int getHealing() {
@@ -32,5 +14,9 @@ public class Character {
 
     public void setHealing(int healing) {
         this.healing = healing;
+    }
+
+    public void heal() {
+        this.health += healing;
     }
 }

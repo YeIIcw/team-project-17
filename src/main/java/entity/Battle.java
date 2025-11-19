@@ -1,39 +1,39 @@
 package entity;
 
 public class Battle {
-    private Character player;
-    private Enemy enemy;
+    private Combatant player;
+    private Combatant opponent;
     private boolean playerTurn;
     private boolean ongoing;
     private boolean playerWon;
     private boolean playerLost;
 
-    public Battle(Character player, Enemy enemy) {
+    public Battle(Combatant player, Combatant opponent) {
         this.player = player;
-        this.enemy = enemy;
-        playerTurn = true;
-        ongoing = true;
-        playerWon = false;
-        playerLost = false;
+        this.opponent = opponent;
+        this.playerTurn = true;
+        this.ongoing = true;
+        this.playerWon = false;
+        this.playerLost = false;
     }
 
-    public Character getPlayer() {
+    public Combatant getPlayer() {
         return player;
     }
 
-    public void setPlayer(Character player) {
+    public void setPlayer(Combatant player) {
         this.player = player;
     }
 
-    public Enemy getEnemy() {
-        return enemy;
+    public Combatant getOpponent() {
+        return opponent;
     }
 
-    public void setEnemy(Enemy enemy) {
-        this.enemy = enemy;
+    public void setOpponent(Combatant opponent) {
+        this.opponent = opponent;
     }
 
-    public boolean getPlayerTurn() {
+    public boolean isPlayerTurn() {
         return playerTurn;
     }
 
@@ -41,7 +41,7 @@ public class Battle {
         this.playerTurn = playerTurn;
     }
 
-    public boolean getOngoing() {
+    public boolean isOngoing() {
         return ongoing;
     }
 
@@ -49,7 +49,7 @@ public class Battle {
         this.ongoing = ongoing;
     }
 
-    public boolean getPlayerWon() {
+    public boolean isPlayerWon() {
         return playerWon;
     }
 
@@ -57,7 +57,7 @@ public class Battle {
         this.playerWon = playerWon;
     }
 
-    public boolean getPlayerLost() {
+    public boolean isPlayerLost() {
         return playerLost;
     }
 
