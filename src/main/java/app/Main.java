@@ -1,24 +1,34 @@
 package app;
 
-import javax.swing.*;
-import view.HomeScreenView;
+import javax.swing.SwingUtilities;
 
 public class Main {
     public static void main(String[] args) {
-        AppBuilder appBuilder = new AppBuilder();
-        appBuilder.addHomeScreenView();
-        appBuilder.addHomeScreenUseCase();
-        appBuilder.addSignupView();
-        appBuilder.addSignupUseCase();
-        appBuilder.addLoginView();
-        appBuilder.addLoginUseCase();
-        appBuilder.addAccountCreatedView();
-        appBuilder.addAccountCreatedUseCase();
-        appBuilder.addLoggedInView();
-        appBuilder.addLoggedInUseCase();
-        appBuilder.addPreferencesView();
-        appBuilder.addPreferencesUseCase();
+        SwingUtilities.invokeLater(() -> {
+            AppBuilder appBuilder = new AppBuilder();
 
-        appBuilder.build();
+            appBuilder
+                    .addGameState()
+
+                    .addHomeScreenView()
+                    .addHomeScreenUseCase()
+
+                    .addSignupView()
+                    .addSignupUseCase()
+
+                    .addLoginView()
+                    .addLoginUseCase()
+
+                    .addAccountCreatedView()
+                    .addAccountCreatedUseCase()
+
+                    .addPreferencesView()
+                    .addPreferencesUseCase()
+
+                    .addLoggedInUseCase()
+                    .addLoggedInView()
+
+                    .build();
+        });
     }
 }

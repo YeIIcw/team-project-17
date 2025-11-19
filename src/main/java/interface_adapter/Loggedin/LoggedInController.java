@@ -6,9 +6,13 @@ import view.PreferencesView;
 
 public class LoggedInController {
 
-    public void goToPreferences() {
-        PreferencesView preferencesView = new PreferencesView(new PreferencesViewModel());
+    private final PreferencesView preferencesView;
 
+    public LoggedInController(PreferencesView preferencesView) {
+        this.preferencesView = preferencesView;
+    }
+
+    public void goToPreferences() {
         preferencesView.display();
     }
 

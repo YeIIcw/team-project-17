@@ -1,9 +1,13 @@
 package interface_adapter.Login;
 
 import entity.Player;
+import interface_adapter.Loggedin.LoggedInController;
 import interface_adapter.Loggedin.LoggedInViewModel;
 import use_case.login.LoginInteractor;
 import view.LoggedInView;
+import interface_adapter.Preferences.PreferencesViewModel;
+import view.PreferencesView;
+
 
 import java.io.IOException;
 
@@ -22,7 +26,14 @@ public class LoginController {
 
         this.player = loginInteractor.getPlayer();
 
-        LoggedInView loggedInView = new LoggedInView(new LoggedInViewModel());
+//        LoggedInView loggedInView = new LoggedInView(new LoggedInViewModel());
+//        loggedInView.display();
+        PreferencesViewModel preferencesViewModel = new PreferencesViewModel();
+        PreferencesView preferencesView = new PreferencesView(preferencesViewModel);
+
+        LoggedInController loggedInController = new LoggedInController(preferencesView);
+
+        LoggedInView loggedInView = new LoggedInView(new LoggedInViewModel(), loggedInController);
         loggedInView.display();
     }
 

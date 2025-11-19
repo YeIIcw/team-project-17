@@ -7,8 +7,8 @@ import javax.swing.*;
 
 public class PreferencesView {
 
-    private PreferencesViewModel preferencesViewModel;
-    private final PreferencesController preferencesController;
+    private final PreferencesViewModel preferencesViewModel;
+    private PreferencesController preferencesController;
 
     private final JFrame frame = new JFrame();
 
@@ -26,6 +26,7 @@ public class PreferencesView {
     String[] difficulties = {"Easy", "Medium", "Hard"};
     String[] types = {"Multiple Choice", "True/False"};
     String[] numQuestions = {"10", "20", "30", "40", "50"};
+
     private final JComboBox<String> categoriesDropdown = new JComboBox<>(categories);
     private final JComboBox<String> difficultyDropdown = new JComboBox<>(difficulties);
     private final JComboBox<String> typesDropdown = new JComboBox<>(types);
@@ -33,10 +34,8 @@ public class PreferencesView {
 
     private final JButton doneButton = new JButton("Done");
 
-    public PreferencesView(PreferencesViewModel preferencesViewModel,
-                           PreferencesController preferencesController) {
+    public PreferencesView(PreferencesViewModel preferencesViewModel) {
         this.preferencesViewModel = preferencesViewModel;
-        this.preferencesController = preferencesController;
 
         JPanel category = new JPanel();
         category.add(categoryLabel);
@@ -71,29 +70,41 @@ public class PreferencesView {
         frame.pack();
 
         doneButton.addActionListener(e -> {
+            String categoryChoice   = (String) categoriesDropdown.getSelectedItem();
+            String difficultyChoice = (String) difficultyDropdown.getSelectedItem();
+            String typeChoice       = (String) typesDropdown.getSelectedItem();
+            int numQuestionChoice   = Integer.parseInt((String) numQuestionDropdown.getSelectedItem());
 
-            if (e.getSource().equals(doneButton)) {
-                String categoryChoice =  (String) categoriesDropdown.getSelectedItem();
-                String difficultyChoice =  (String) difficultyDropdown.getSelectedItem();
-                String typeChoice =  (String) typesDropdown.getSelectedItem();
-                int numQuestionChoice =  Integer.parseInt((String)(numQuestionDropdown.getSelectedItem()));
+            // ViewModel can be updated here
+            preferencesViewModel.setCategory(categoryChoice);
+            preferencesViewModel.setDifficulty(difficultyChoice);
+            preferencesViewModel.setType(typeChoice);
+            preferencesViewModel.setNumQuestions(numQuestionChoice);
 
+            // Use injected controller
+            if (preferencesController != null) {
                 preferencesController.execute(
                         categoryChoice,
                         difficultyChoice,
                         typeChoice,
                         numQuestionChoice
                 );
-
-                frame.dispose();
             }
 
+            // optional: inspect ViewModel for success / error
+            if (!preferencesViewModel.isSuccess() && preferencesViewModel.getMessage() != null) {
+                JOptionPane.showMessageDialog(frame, preferencesViewModel.getMessage());
+            } else {
+                frame.dispose(); // move to next screen
+            }
         });
+    }
+
+    public void setPreferencesController(PreferencesController controller) {
+        this.preferencesController = controller;
     }
 
     public void display() {
         frame.setVisible(true);
     }
-
-
 }

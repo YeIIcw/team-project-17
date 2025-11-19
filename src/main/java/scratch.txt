@@ -1,3 +1,4 @@
 username, password, points
 test, test, 0
 abc, abc, 0
+cc, cc, 0
