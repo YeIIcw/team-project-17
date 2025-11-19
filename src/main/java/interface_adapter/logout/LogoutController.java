@@ -1,4 +1,4 @@
-package interface_adapter.Logout;
+package interface_adapter.logout;
 
 import interface_adapter.HomeScreen.HomeScreenViewModel;
 import interface_adapter.Loggedin.LoggedInViewModel;
