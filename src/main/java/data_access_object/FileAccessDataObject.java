@@ -1,4 +1,4 @@
-package data_access;
+package data_access_object;
 
 import use_case.login.LoginUserDataAccessInterface;
 import use_case.signup.SignupUserDataAccessInterface;

@@ -1,6 +1,5 @@
 package use_case.login;
 
-import data_access.FileAccessDataObject;
 import entity.Player;
 
 import java.io.IOException;
