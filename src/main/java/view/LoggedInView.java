@@ -2,7 +2,7 @@ package view;
 
 import interface_adapter.Loggedin.LoggedInController;
 import interface_adapter.Loggedin.LoggedInViewModel;
-import interface_adapter.Logout.LogoutController;
+import interface_adapter.logout.LogoutController;
 
 import javax.swing.*;
 
