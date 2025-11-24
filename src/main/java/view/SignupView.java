@@ -1,5 +1,6 @@
 package view;
 
+import interface_adapter.Login.LoginController;
 import interface_adapter.Signup.SignUpViewModel;
 import interface_adapter.Signup.SignupController;
 
@@ -16,6 +17,7 @@ public class SignupView {
     private final JTextField usernameText = new JTextField(10);
     private final JPasswordField passwordText = new JPasswordField(10);
     private final JButton createButton = new JButton("Create");
+    private final JButton backButton = new JButton("Back");
 
     public SignupView(SignUpViewModel signUpViewModel) {
         this.signUpViewModel = signUpViewModel;
@@ -33,6 +35,7 @@ public class SignupView {
         mainPanel.add(usernamePanel);
         mainPanel.add(passwordPanel);
         mainPanel.add(createButton);
+        mainPanel.add(backButton);
 
         frame.add(mainPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -57,6 +60,19 @@ public class SignupView {
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
+            }
+        });
+
+        backButton.addActionListener(e -> {
+            if (e.getSource().equals(backButton)) {
+                LoginController loginController = new LoginController();
+                try {
+                    loginController.goBack();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+                frame.dispose();
             }
         });
     }
