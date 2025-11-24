@@ -136,8 +136,8 @@ public class AppBuilder {
     public AppBuilder addPreferencesUseCase() {
         // Use FakeQuestionFetcher for testing (no API calls)
         // Switch to ApiQuestionFetcher() when API is working
-        QuestionFetcher questionFetcher = new FakeQuestionFetcher();
-        System.out.println("DEBUG: AppBuilder - Using FakeQuestionFetcher for testing");
+        QuestionFetcher questionFetcher = new ApiQuestionFetcher();
+        System.out.println("DEBUG: AppBuilder - Using ApiQuestionFetcher for live API calls");
 
         Map<String, Integer> categoryMap = new HashMap<>();
         categoryMap.put("General Knowledge", 9);
