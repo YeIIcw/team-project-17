@@ -1,35 +1,45 @@
 package app;
 
-import data_access.Gateway.triviaapi.ApiQuestionFetcher;
 import data_access.Gateway.triviaapi.FakeQuestionFetcher;
 import data_access.Gateway.triviaapi.QuestionFetcher;
+
 import entity.GameState;
+
 import interface_adapter.AccountCreated.AccountCreatedViewModel;
 import interface_adapter.HomeScreen.HomeScreenViewModel;
 import interface_adapter.Loggedin.LoggedInController;
 import interface_adapter.Loggedin.LoggedInViewModel;
 import interface_adapter.Login.LoginViewModel;
+
 import interface_adapter.Gameplay.GameplayController;
 import interface_adapter.Gameplay.GameplayPresenter;
 import interface_adapter.Gameplay.GameplayViewModel;
+
 import interface_adapter.Preferences.PreferencesController;
 import interface_adapter.Preferences.PreferencesPresenter;
 import interface_adapter.Preferences.PreferencesViewModel;
+
 import interface_adapter.Signup.SignUpViewModel;
+
+import interface_adapter.Combat.CombatController;
+import interface_adapter.Combat.CombatPresenter;
+import interface_adapter.Combat.CombatViewModel;
+
 import use_case.gameplay.GameplayInputBoundary;
 import use_case.gameplay.GameplayInteractor;
 import use_case.gameplay.GameplayOutputBoundary;
+
 import use_case.preferences.PreferencesInputBoundary;
 import use_case.preferences.PreferencesInteractor;
-import use_case.preferences.PreferencesOutputBoundary;
+
+import use_case.combat.CombatInteractor;
+
 import view.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class AppBuilder {
-
-    // ====== Views & ViewModels ======
 
     private HomeScreenView homeScreenView;
     private HomeScreenViewModel homeScreenViewModel;
@@ -52,13 +62,62 @@ public class AppBuilder {
 
     private GameplayView gameplayView;
     private GameplayViewModel gameplayViewModel;
+    private GameplayPresenter gameplayPresenter;
+    private GameplayInteractor gameplayInteractor;
 
-    // ====== Core game state & controllers ======
+    private CombatView combatView;
+    private CombatViewModel combatViewModel;
+    private CombatController combatController;
+    private CombatInteractor combatInteractor;
+    private CombatPresenter combatPresenter;
 
     private GameState gameState;
     private LoggedInController loggedInController;
 
-    // ---------- Home Screen ----------
+    public void resetAndRestart() {
+        System.out.println("DEBUG: AppBuilder - FULL RESET");
+
+        this.gameState = new GameState();
+
+        rebuildCombatStack();
+
+        preferencesView.getFrame().setVisible(true);
+    }
+
+    private void rebuildCombatStack() {
+        System.out.println("DEBUG: AppBuilder - rebuildCombatStack()");
+
+        combatViewModel  = new CombatViewModel();
+        combatPresenter  = new CombatPresenter(combatViewModel);
+        combatInteractor = new CombatInteractor(combatPresenter, gameState);
+        combatController = new CombatController(combatInteractor);
+        combatView       = new CombatView(combatController, combatViewModel);
+
+        // Combat -> Question köprüsü
+        if (gameplayView != null) {
+            gameplayView.setCombatController(combatController);
+
+            combatView.setOnQuestionRequested(() -> {
+                String diff = combatViewModel.getQuestionDifficulty();
+                if (diff == null) diff = "Question";
+                gameplayView.askCombatQuestion(diff);
+            });
+        }
+
+        combatPresenter.setUiUpdateCallback(() -> combatView.refreshFromViewModel());
+
+        // Game Over screen
+        combatPresenter.setGameOverCallback(() -> {
+            combatView.setVisibleFalse();
+
+            int enemiesDefeated = gameState.getEnemyIndex();
+            int finalScore = gameState.getScore();
+
+            GameOverView gov = new GameOverView(this, gameState.getScore(), gameState.getEnemiesDefeated());
+            gov.display();
+        });
+
+    }
 
     public AppBuilder addHomeScreenView() {
         homeScreenViewModel = new HomeScreenViewModel();
@@ -67,16 +126,8 @@ public class AppBuilder {
     }
 
     public AppBuilder addHomeScreenUseCase() {
-        // Wire HomeScreenController with views after they're created
-        // This happens after addLoginView() and addSignupView()
         return this;
     }
-
-    public HomeScreenView getHomeScreenView() {
-        return homeScreenView;
-    }
-
-    // ---------- Signup ----------
 
     public AppBuilder addSignupView() {
         signUpViewModel = new SignUpViewModel();
@@ -85,11 +136,8 @@ public class AppBuilder {
     }
 
     public AppBuilder addSignupUseCase() {
-        // hook up signup use case if needed
         return this;
     }
-
-    // ---------- Login ----------
 
     public AppBuilder addLoginView() {
         loginViewModel = new LoginViewModel();
@@ -98,13 +146,8 @@ public class AppBuilder {
     }
 
     public AppBuilder addLoginUseCase() {
-        // Note: LoginController is created in LoginView, but we need to wire it
-        // with LoggedInController after both are created
-        // This is done in addLoggedInUseCase() after LoggedInController is created
         return this;
     }
-
-    // ---------- Account Created ----------
 
     public AppBuilder addAccountCreatedView() {
         accountCreatedViewModel = new AccountCreatedViewModel();
@@ -113,18 +156,18 @@ public class AppBuilder {
     }
 
     public AppBuilder addAccountCreatedUseCase() {
-        // hook up account created use case if needed
         return this;
     }
-
-    // ---------- Game State ----------
 
     public AppBuilder addGameState() {
         this.gameState = new GameState();
         return this;
     }
 
-    // ---------- Preferences (Quiz setup) ----------
+    public AppBuilder addCombatUseCase() {
+        rebuildCombatStack();
+        return this;
+    }
 
     public AppBuilder addPreferencesView() {
         preferencesViewModel = new PreferencesViewModel();
@@ -132,12 +175,9 @@ public class AppBuilder {
         return this;
     }
 
-    // This is the real preferences use case wiring
     public AppBuilder addPreferencesUseCase() {
-        // Use FakeQuestionFetcher for testing (no API calls)
-        // Switch to ApiQuestionFetcher() when API is working
         QuestionFetcher questionFetcher = new FakeQuestionFetcher();
-        System.out.println("DEBUG: AppBuilder - Using FakeQuestionFetcher for testing");
+        System.out.println("DEBUG: AppBuilder - Using FakeQuestionFetcher");
 
         Map<String, Integer> categoryMap = new HashMap<>();
         categoryMap.put("General Knowledge", 9);
@@ -175,113 +215,59 @@ public class AppBuilder {
                 new PreferencesController(interactor);
 
         preferencesView.setPreferencesController(this.preferencesController);
-        System.out.println("DEBUG: AppBuilder - PreferencesController set on PreferencesView");
 
-        // Also set PreferencesController on LoginView so it can pass it to LoginController
+        presenter.setOnSuccessCallback(() -> {
+            System.out.println("DEBUG: AppBuilder - Preferences success → COMBAT");
+            preferencesView.getFrame().dispose();
+            combatController.startBattle();
+            combatView.display();
+        });
+
         if (loginView != null) {
             loginView.setPreferencesController(this.preferencesController);
             System.out.println("DEBUG: AppBuilder - PreferencesController set on LoginView");
         }
 
-        // Set callback to open gameplay view when questions are successfully fetched
-        presenter.setOnSuccessCallback(() -> {
-            System.out.println("DEBUG: AppBuilder - Success callback triggered");
-            System.out.println("DEBUG: AppBuilder - Disposing PreferencesView frame");
-            preferencesView.getFrame().dispose();
-            
-            if (gameplayView != null) {
-                System.out.println("DEBUG: AppBuilder - GameplayView exists, displaying it");
-                gameplayView.display();
-                System.out.println("DEBUG: AppBuilder - GameplayView displayed");
-            } else {
-                System.out.println("ERROR: AppBuilder - gameplayView is null! Cannot display gameplay.");
-            }
-        });
-
         return this;
     }
 
-    public PreferencesView getPreferencesView() {
-        return preferencesView;
-    }
-
-    public PreferencesController getPreferencesController() {
-        return preferencesController;
-    }
-
-    // ---------- Logged In ----------
-
-    // Creates the controller, using the already-wired preferencesView
     public AppBuilder addLoggedInUseCase() {
-        System.out.println("DEBUG: AppBuilder - addLoggedInUseCase() called");
         loggedInViewModel = new LoggedInViewModel();
         loggedInController = new LoggedInController(preferencesView);
-        System.out.println("DEBUG: AppBuilder - LoggedInController created with PreferencesView");
-        
-        // Also set LoggedInController on LoginView so LoginController can use it
-        if (loginView != null) {
+
+        if (loginView != null)
             loginView.setLoggedInController(loggedInController);
-            System.out.println("DEBUG: AppBuilder - LoggedInController set on LoginView");
-        }
-        
+
         return this;
     }
 
-    public LoggedInController getLoggedInController() {
-        return loggedInController;
-    }
-
-    // Creates the LoggedInView using the ViewModel + Controller
     public AppBuilder addLoggedInView() {
         loggedInView = new LoggedInView(loggedInViewModel, loggedInController);
-        
-        // Wire HomeScreenController with views now that all views are created
+
         if (homeScreenView != null && loginView != null && signupView != null) {
-            interface_adapter.HomeScreen.HomeScreenController homeScreenController = 
-                new interface_adapter.HomeScreen.HomeScreenController(loginView, signupView);
-            homeScreenView.setHomeScreenController(homeScreenController);
-            System.out.println("DEBUG: AppBuilder - HomeScreenController wired with LoginView and SignupView");
+            var homeCtrl = new interface_adapter.HomeScreen.HomeScreenController(loginView, signupView);
+            homeScreenView.setHomeScreenController(homeCtrl);
         }
-        
+
         return this;
     }
 
-    // ---------- Gameplay ----------
-
     public AppBuilder addGameplayView() {
-        System.out.println("DEBUG: AppBuilder - addGameplayView() called");
         gameplayViewModel = new GameplayViewModel();
-        System.out.println("DEBUG: AppBuilder - GameplayViewModel created");
         return this;
     }
 
     public AppBuilder addGameplayUseCase() {
-        System.out.println("DEBUG: AppBuilder - addGameplayUseCase() called");
-        
-        if (gameplayViewModel == null) {
-            throw new IllegalStateException("GameplayViewModel must be created before use case");
-        }
-
-        GameplayOutputBoundary presenter = new GameplayPresenter(gameplayViewModel);
-        System.out.println("DEBUG: AppBuilder - GameplayPresenter created");
-        
-        GameplayInputBoundary interactor = new GameplayInteractor(gameState, presenter);
-        System.out.println("DEBUG: AppBuilder - GameplayInteractor created");
-        
+        gameplayPresenter = new GameplayPresenter(gameplayViewModel);
+        gameplayInteractor = new GameplayInteractor(gameState, gameplayPresenter);
+        GameplayInputBoundary interactor = gameplayInteractor;
         GameplayController controller = new GameplayController(interactor);
-        System.out.println("DEBUG: AppBuilder - GameplayController created");
-        
-        gameplayView = new GameplayView(gameplayViewModel, controller);
-        System.out.println("DEBUG: AppBuilder - GameplayView created");
-        // First question is loaded automatically in GameplayView constructor
 
+        gameplayView = new GameplayView(gameplayViewModel, controller);
         return this;
     }
 
-    // ---------- Final build ----------
-
     public void build() {
-        // Start the app at the home screen
         homeScreenView.display();
     }
 }

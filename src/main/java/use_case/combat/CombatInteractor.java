@@ -1,51 +1,55 @@
 package use_case.combat;
 
-import java.util.Random;
-
 import entity.Battle;
 import entity.Character;
 import entity.Combatant;
 import entity.Enemy;
+import entity.GameState;
+
+import java.util.Random;
 
 public class CombatInteractor implements CombatInputBoundary {
+
     private final CombatOutputBoundary presenter;
-    private final Combatant player;
-    private final Combatant opponent;
-    private final Random random;
+    private final GameState gameState;
 
     private Battle battle;
+    private final Random random = new Random();
+
     private String pendingActionType;
     private int pendingEnemyDamage;
 
-    public CombatInteractor(CombatOutputBoundary presenter, Combatant player, Combatant opponent) {
+    public CombatInteractor(CombatOutputBoundary presenter, GameState gameState) {
         this.presenter = presenter;
-        this.player = player;
-        this.opponent = opponent;
-        this.random = new Random();
+        this.gameState = gameState;
+        this.battle = null;
+        this.pendingActionType = null;
+        this.pendingEnemyDamage = 0;
     }
 
     @Override
     public void startBattle() {
-        battle = new Battle(player, opponent);
+        Character player = gameState.getPlayer();
+        Enemy enemy = gameState.getCurrentEnemy();
+
+        battle = new Battle(player, enemy);
         pendingActionType = null;
         pendingEnemyDamage = 0;
 
-        CombatOutputData outputData = new CombatOutputData(
+        CombatOutputData out = new CombatOutputData(
                 player.getHealth(),
-                opponent.getHealth(),
+                enemy.getHealth(),
                 true,
                 false,
                 false,
-                0,
-                0,
-                0,
+                0, 0, 0,
                 "PLAYER_ACTION_CHOICE",
                 null,
                 null,
                 null,
                 0
         );
-        presenter.present(outputData);
+        presenter.present(out);
     }
 
     @Override
@@ -57,9 +61,9 @@ public class CombatInteractor implements CombatInputBoundary {
         pendingActionType = inputData.getActionType();
         String difficulty = getPlayerActionDifficulty(pendingActionType);
 
-        CombatOutputData outputData = new CombatOutputData(
-                player.getHealth(),
-                opponent.getHealth(),
+        CombatOutputData out = new CombatOutputData(
+                battle.getPlayer().getHealth(),
+                battle.getOpponent().getHealth(),
                 battle.isOngoing(),
                 battle.isPlayerWon(),
                 battle.isPlayerLost(),
@@ -72,7 +76,7 @@ public class CombatInteractor implements CombatInputBoundary {
                 null,
                 0
         );
-        presenter.present(outputData);
+        presenter.present(out);
     }
 
     @Override
@@ -81,23 +85,35 @@ public class CombatInteractor implements CombatInputBoundary {
             return;
         }
 
-        boolean correct = inputData.isCorrect();
+        Combatant player = battle.getPlayer();
+        Combatant enemy = battle.getOpponent();
 
+        boolean correct = inputData.isCorrect();
         int damageToPlayer = 0;
         int damageToOpponent = 0;
         int healAmount = 0;
 
+        gameState.addXP(5);
+
         if (correct && pendingActionType != null) {
-            if (CombatInputData.ACTION_LIGHT.equals(pendingActionType)) {
-                int before = opponent.getHealth();
-                opponent.takeDamage(player.getDamage());
-                damageToOpponent = before - opponent.getHealth();
-            } else if (CombatInputData.ACTION_HEAVY.equals(pendingActionType)) {
-                int before = opponent.getHealth();
-                int heavyDamage = (player.getDamage() * 3) / 2;
-                opponent.takeDamage(heavyDamage);
-                damageToOpponent = before - opponent.getHealth();
-            } else if (CombatInputData.ACTION_HEAL.equals(pendingActionType)) {
+
+            if (pendingActionType.equals(CombatInputData.ACTION_LIGHT)) {
+                int before = enemy.getHealth();
+                enemy.takeDamage(player.getDamage());
+                damageToOpponent = before - enemy.getHealth();
+
+            } else if (pendingActionType.equals(CombatInputData.ACTION_HEAVY)) {
+
+                if (random.nextDouble() <= 0.75) {
+                    int heavyDamage = (player.getDamage() * 3) / 2;
+                    int before = enemy.getHealth();
+                    enemy.takeDamage(heavyDamage);
+                    damageToOpponent = before - enemy.getHealth();
+                } else {
+                    damageToOpponent = -1; // heavy attack miss işareti
+                }
+
+            } else if (pendingActionType.equals(CombatInputData.ACTION_HEAL)) {
                 if (player instanceof Character) {
                     Character c = (Character) player;
                     int before = c.getHealth();
@@ -110,32 +126,17 @@ public class CombatInteractor implements CombatInputBoundary {
         updateBattleState();
 
         if (!battle.isOngoing()) {
-            CombatOutputData outputData = new CombatOutputData(
-                    player.getHealth(),
-                    opponent.getHealth(),
-                    false,
-                    battle.isPlayerWon(),
-                    battle.isPlayerLost(),
-                    damageToPlayer,
-                    damageToOpponent,
-                    healAmount,
-                    "FINISHED",
-                    null,
-                    pendingActionType,
-                    null,
-                    0
-            );
-            presenter.present(outputData);
+            handleBattleEnd(damageToPlayer, damageToOpponent, healAmount, pendingActionType, null);
             return;
         }
 
-        int baseDamage = opponent.getDamage();
-        int multiplier = random.nextInt(2) + 1;
-        pendingEnemyDamage = baseDamage * multiplier;
+        int baseDamage = enemy.getDamage();
+        double mult = 1.0 + random.nextDouble(); // 1.0–2.0 arası
+        pendingEnemyDamage = (int) Math.round(baseDamage * mult);
 
-        CombatOutputData outputData = new CombatOutputData(
+        CombatOutputData out = new CombatOutputData(
                 player.getHealth(),
-                opponent.getHealth(),
+                enemy.getHealth(),
                 battle.isOngoing(),
                 battle.isPlayerWon(),
                 battle.isPlayerLost(),
@@ -148,7 +149,7 @@ public class CombatInteractor implements CombatInputBoundary {
                 null,
                 pendingEnemyDamage
         );
-        presenter.present(outputData);
+        presenter.present(out);
     }
 
     @Override
@@ -160,16 +161,32 @@ public class CombatInteractor implements CombatInputBoundary {
         String defenseType = inputData.getDefenseType();
         boolean correct = inputData.isCorrect();
 
+        Combatant player = battle.getPlayer();
+        Combatant enemy = battle.getOpponent();
+
         int damageToPlayer = 0;
         int damageToOpponent = 0;
         int healAmount = 0;
 
+        gameState.addXP(5);
+
         if (correct) {
+
             if (CombatInputData.DEFENSE_COUNTER.equals(defenseType)) {
-                int before = opponent.getHealth();
-                opponent.takeDamage(player.getDamage());
-                damageToOpponent = before - opponent.getHealth();
+                double roll = random.nextDouble();
+
+                if (roll <= 0.70) {
+                    int before = enemy.getHealth();
+                    enemy.takeDamage(player.getDamage());
+                    damageToOpponent = before - enemy.getHealth();
+                } else {
+                    int before = player.getHealth();
+                    player.takeDamage(pendingEnemyDamage);
+                    damageToPlayer = before - player.getHealth();
+                    damageToOpponent = -2;
+                }
             }
+
         } else {
             int before = player.getHealth();
             player.takeDamage(pendingEnemyDamage);
@@ -177,32 +194,16 @@ public class CombatInteractor implements CombatInputBoundary {
         }
 
         pendingEnemyDamage = 0;
-
         updateBattleState();
 
         if (!battle.isOngoing()) {
-            CombatOutputData outputData = new CombatOutputData(
-                    player.getHealth(),
-                    opponent.getHealth(),
-                    false,
-                    battle.isPlayerWon(),
-                    battle.isPlayerLost(),
-                    damageToPlayer,
-                    damageToOpponent,
-                    healAmount,
-                    "FINISHED",
-                    null,
-                    pendingActionType,
-                    defenseType,
-                    0
-            );
-            presenter.present(outputData);
+            handleBattleEnd(damageToPlayer, damageToOpponent, healAmount, pendingActionType, defenseType);
             return;
         }
 
-        CombatOutputData outputData = new CombatOutputData(
+        CombatOutputData out = new CombatOutputData(
                 player.getHealth(),
-                opponent.getHealth(),
+                enemy.getHealth(),
                 battle.isOngoing(),
                 battle.isPlayerWon(),
                 battle.isPlayerLost(),
@@ -215,29 +216,83 @@ public class CombatInteractor implements CombatInputBoundary {
                 defenseType,
                 0
         );
-        presenter.present(outputData);
+        presenter.present(out);
     }
 
+
     private void updateBattleState() {
-        if (opponent.isDead()) {
+        if (battle.getOpponent().isDead()) {
             battle.setOngoing(false);
             battle.setPlayerWon(true);
-            battle.setPlayerLost(false);
-        } else if (player.isDead()) {
+        } else if (battle.getPlayer().isDead()) {
             battle.setOngoing(false);
-            battle.setPlayerWon(false);
             battle.setPlayerLost(true);
         }
     }
 
-    private String getPlayerActionDifficulty(String actionType) {
-        if (CombatInputData.ACTION_LIGHT.equals(actionType)) {
-            return "EASY";
-        } else if (CombatInputData.ACTION_HEAVY.equals(actionType)) {
-            return "MEDIUM";
-        } else if (CombatInputData.ACTION_HEAL.equals(actionType)) {
-            return "EASY";
+    private void handleBattleEnd(int dmgToPlayer,
+                                 int dmgToOpponent,
+                                 int healing,
+                                 String actionType,
+                                 String defenseType) {
+
+        if (battle.isPlayerWon()) {
+            int xpGain = 20 + gameState.getEnemyIndex() * 10;
+            gameState.addXP(xpGain);
+            gameState.incrementEnemiesDefeated();
+            gameState.nextEnemy();
+            gameState.resetPlayerHealth();
+
+            Enemy nextEnemy = gameState.getCurrentEnemy();
+            battle = new Battle(gameState.getPlayer(), nextEnemy);
+            pendingEnemyDamage = 0;
+            pendingActionType = null;
+
+            CombatOutputData out = new CombatOutputData(
+                    battle.getPlayer().getHealth(),
+                    battle.getOpponent().getHealth(),
+                    true,
+                    false,
+                    false,
+                    dmgToPlayer,
+                    dmgToOpponent,
+                    healing,
+                    "PLAYER_ACTION_CHOICE",
+                    null,
+                    null,
+                    defenseType,
+                    0
+            );
+            presenter.present(out);
+            return;
         }
+
+        if (battle.isPlayerLost()) {
+            CombatOutputData out = new CombatOutputData(
+                    battle.getPlayer().getHealth(),
+                    battle.getOpponent().getHealth(),
+                    false,
+                    false,
+                    true,
+                    dmgToPlayer,
+                    dmgToOpponent,
+                    healing,
+                    "GAME_OVER",
+                    null,
+                    actionType,
+                    defenseType,
+                    0
+            );
+            presenter.present(out);
+            return;
+        }
+    }
+
+    private String getPlayerActionDifficulty(String actionType) {
+        if (actionType == null) return "EASY";
+        if (actionType.equals(CombatInputData.ACTION_LIGHT)) return "EASY";
+        if (actionType.equals(CombatInputData.ACTION_HEAVY)) return "MEDIUM";
+        if (actionType.equals(CombatInputData.ACTION_HEAL)) return "EASY";
         return "EASY";
     }
 }

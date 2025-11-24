@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.BorderFactory;
+import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.Font;
@@ -15,8 +16,13 @@ import java.awt.Dimension;
 import java.awt.event.ActionListener;
 
 public class CombatView extends JPanel {
+
     private final CombatController controller;
     private final CombatViewModel viewModel;
+
+    private Runnable onQuestionRequested;
+
+    private JFrame frame;
 
     private JLabel playerHealthLabel;
     private JLabel opponentHealthLabel;
@@ -37,9 +43,26 @@ public class CombatView extends JPanel {
     public CombatView(CombatController controller, CombatViewModel viewModel) {
         this.controller = controller;
         this.viewModel = viewModel;
+
+        this.frame = new JFrame("Combat");
+
         initComponents();
         layoutComponents();
         wireActionButtons();
+
+        frame.add(this);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+    }
+
+    public void display() {
+        refreshFromViewModel();
+        frame.setVisible(true);
+    }
+
+    public void setVisibleFalse() {
+        frame.setVisible(false);
     }
 
     private void initComponents() {
@@ -112,11 +135,28 @@ public class CombatView extends JPanel {
     }
 
     private void wireActionButtons() {
+        // Attacks: same as before
         lightAttackButton.addActionListener(e -> controller.chooseLightAttack());
         heavyAttackButton.addActionListener(e -> controller.chooseHeavyAttack());
         healButton.addActionListener(e -> controller.chooseHeal());
+
+        // DEFENSE: mark pending defense + open trivia question
+        dodgeButton.addActionListener(e -> {
+            controller.markPendingDodge();
+            if (onQuestionRequested != null) {
+                onQuestionRequested.run();
+            }
+        });
+
+        counterButton.addActionListener(e -> {
+            controller.markPendingCounter();
+            if (onQuestionRequested != null) {
+                onQuestionRequested.run();
+            }
+        });
     }
 
+    // still available if something else wants to override listeners
     public void setDodgeActionListener(ActionListener listener) {
         for (ActionListener l : dodgeButton.getActionListeners()) {
             dodgeButton.removeActionListener(l);
@@ -134,13 +174,22 @@ public class CombatView extends JPanel {
     public void refreshFromViewModel() {
         int playerHp = viewModel.getPlayerHealth();
         int opponentHp = viewModel.getOpponentHealth();
+        String phase = viewModel.getNextPhase();
+
+        if ("GAME_OVER".equals(phase)) {
+            setVisibleFalse();
+            return;
+        }
+
+        int dmgToEnemyRaw = viewModel.getDamageToOpponent();
+        int dmgToPlayer = viewModel.getDamageToPlayer();
+        int heal = viewModel.getHealAmount();
 
         playerHealthLabel.setText("Player HP: " + playerHp);
         opponentHealthLabel.setText("Enemy HP: " + opponentHp);
-        playerDamageLabel.setText("Damage: " + viewModel.getDamageToOpponent() + " dealt last turn");
-        playerHealLabel.setText("Heal: " + viewModel.getHealAmount() + " last turn");
+        playerDamageLabel.setText("Damage: " + Math.max(0, dmgToEnemyRaw) + " dealt last turn");
+        playerHealLabel.setText("Heal: " + heal + " last turn");
 
-        String phase = viewModel.getNextPhase();
         phaseLabel.setText("Phase: " + phase);
 
         String diff = viewModel.getQuestionDifficulty();
@@ -151,31 +200,35 @@ public class CombatView extends JPanel {
         }
 
         String message = "";
-        int dmgToEnemy = viewModel.getDamageToOpponent();
-        int dmgToPlayer = viewModel.getDamageToPlayer();
-        int heal = viewModel.getHealAmount();
 
         if (!viewModel.isOngoing()) {
             if (viewModel.isPlayerWon()) {
                 message = "You won the battle!";
             } else if (viewModel.isPlayerLost()) {
-                message = "You were defeated.";
+                message = "You died.";
             }
         } else {
-            if (dmgToEnemy > 0) {
-                message = "Dealt " + dmgToEnemy + " damage.";
-            } else if (heal > 0) {
-                message = "Healed " + heal + " HP.";
-            } else if ("PLAYER_ACTION_QUESTION".equals(phase)) {
+            if ("PLAYER_ACTION_QUESTION".equals(phase)) {
                 message = "Answer the question to perform your action.";
+                if (onQuestionRequested != null) {
+                    onQuestionRequested.run();
+                }
             } else if ("DEFENSE_CHOICE".equals(phase)) {
-                message = "Enemy is attacking for " + viewModel.getPendingEnemyDamage() + " damage. Choose a defense.";
+                message = "Enemy is attacking for "
+                        + viewModel.getPendingEnemyDamage()
+                        + " damage. Choose a defense.";
             } else if ("DEFENSE_QUESTION".equals(phase)) {
                 message = "Answer the question to resolve your defense.";
+            } else if (dmgToEnemyRaw == -1) {
+                message = "Heavy attack missed!";
+            } else if (dmgToEnemyRaw == -2) {
+                message = "Counter failed! You took " + dmgToPlayer + " damage.";
+            } else if (dmgToEnemyRaw > 0) {
+                message = "Dealt " + dmgToEnemyRaw + " damage.";
+            } else if (heal > 0) {
+                message = "Healed " + heal + " HP.";
             } else if (dmgToPlayer > 0) {
                 message = "You took " + dmgToPlayer + " damage.";
-            } else {
-                message = "";
             }
         }
 
@@ -191,7 +244,7 @@ public class CombatView extends JPanel {
         counterButton.setEnabled(enableDefense);
     }
 
-    public static void main(String[] args) {
-
+    public void setOnQuestionRequested(Runnable r) {
+        this.onQuestionRequested = r;
     }
 }
