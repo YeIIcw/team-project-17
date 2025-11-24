@@ -15,6 +15,8 @@ import java.io.IOException;
 public class LoginView {
 
     private LoginViewModel loginViewModel;
+    private interface_adapter.Preferences.PreferencesController preferencesController;
+    private interface_adapter.Loggedin.LoggedInController loggedInController;
 
     private final JFrame frame = new JFrame();
     private final JLabel usernameLabel = new JLabel("Username:");
@@ -48,7 +50,27 @@ public class LoginView {
         loginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (e.getSource().equals(loginButton)) {
+                    System.out.println("DEBUG: LoginView - Login button clicked");
+                    System.out.println("DEBUG: LoginView - preferencesController is " + 
+                        (preferencesController != null ? "not null" : "null"));
+                    
                     LoginController loginController = new LoginController();
+                    
+                    // Set PreferencesController if available
+                    if (preferencesController != null) {
+                        System.out.println("DEBUG: LoginView - Setting PreferencesController on LoginController");
+                        loginController.setPreferencesController(preferencesController);
+                    } else {
+                        System.out.println("ERROR: LoginView - preferencesController is null!");
+                    }
+                    
+                    // Set LoggedInController if available (this has the correct PreferencesView)
+                    if (loggedInController != null) {
+                        System.out.println("DEBUG: LoginView - Setting LoggedInController on LoginController");
+                        loginController.setLoggedInController(loggedInController);
+                    } else {
+                        System.out.println("WARNING: LoginView - loggedInController is null, will create new one");
+                    }
 
                     try {
                         JFrame newFrame = new JFrame("Incorrect username or password!");
@@ -79,6 +101,18 @@ public class LoginView {
                 }
             }
         });
+    }
+
+    public void setPreferencesController(interface_adapter.Preferences.PreferencesController controller) {
+        System.out.println("DEBUG: LoginView.setPreferencesController() called with controller: " + 
+            (controller != null ? "not null" : "null"));
+        this.preferencesController = controller;
+        System.out.println("DEBUG: LoginView - preferencesController field is now: " + 
+            (this.preferencesController != null ? "not null" : "null"));
+    }
+
+    public void setLoggedInController(interface_adapter.Loggedin.LoggedInController controller) {
+        this.loggedInController = controller;
     }
 
     public void display() {

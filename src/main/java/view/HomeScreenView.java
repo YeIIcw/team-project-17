@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 public class HomeScreenView {
 
     private HomeScreenViewModel homescreenViewModel;
+    private interface_adapter.HomeScreen.HomeScreenController homeScreenController;
 
     private final JFrame frame = new JFrame();
 
@@ -32,10 +33,15 @@ public class HomeScreenView {
 
         loginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                HomeScreenController homeScreenController = new HomeScreenController();
-
                 if (e.getSource().equals(loginButton)) {
-                    homeScreenController.goToLogin();
+                    if (homeScreenController != null) {
+                        homeScreenController.goToLogin();
+                    } else {
+                        System.out.println("ERROR: HomeScreenView - homeScreenController is null!");
+                        // Fallback: create new controller
+                        HomeScreenController newController = new HomeScreenController();
+                        newController.goToLogin();
+                    }
                     frame.dispose();
                 }
             }
@@ -43,14 +49,23 @@ public class HomeScreenView {
 
         createAccount.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                HomeScreenController homeScreenController = new HomeScreenController();
-
                 if (e.getSource().equals(createAccount)) {
-                    homeScreenController.goToCreateAccount();
+                    if (homeScreenController != null) {
+                        homeScreenController.goToCreateAccount();
+                    } else {
+                        System.out.println("ERROR: HomeScreenView - homeScreenController is null!");
+                        // Fallback: create new controller
+                        HomeScreenController newController = new HomeScreenController();
+                        newController.goToCreateAccount();
+                    }
                     frame.dispose();
                 }
             }
         });
+    }
+
+    public void setHomeScreenController(interface_adapter.HomeScreen.HomeScreenController controller) {
+        this.homeScreenController = controller;
     }
 
     public void display() {
