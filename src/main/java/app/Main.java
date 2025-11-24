@@ -28,8 +28,10 @@ public class Main {
                     .addLoggedInUseCase()
                     .addLoggedInView()
 
-                    .addGameplayView()
-                    .addGameplayUseCase()
+// The GameplayView is being created before any questions are fetched from the API, causing freezes
+// I created them in AppBuilder.addPreferencesUseCase() instead
+//                    .addGameplayView()
+//                    .addGameplayUseCase()
 
                     .build();
         });

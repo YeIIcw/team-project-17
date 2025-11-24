@@ -188,7 +188,12 @@ public class AppBuilder {
             System.out.println("DEBUG: AppBuilder - Success callback triggered");
             System.out.println("DEBUG: AppBuilder - Disposing PreferencesView frame");
             preferencesView.getFrame().dispose();
-            
+
+            // Create GameplayView NOW, after questions are loaded
+            System.out.println("DEBUG: AppBuilder - Creating GameplayView after API success");
+            addGameplayView();
+            addGameplayUseCase();
+
             if (gameplayView != null) {
                 System.out.println("DEBUG: AppBuilder - GameplayView exists, displaying it");
                 gameplayView.display();
