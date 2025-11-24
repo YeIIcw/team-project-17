@@ -2,6 +2,7 @@ package view;
 
 import interface_adapter.Login.LoginController;
 import interface_adapter.Login.LoginViewModel;
+import interface_adapter.logout.LogoutController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,6 +25,7 @@ public class LoginView {
     private final JTextField usernameText = new JTextField(10);
     private final JPasswordField passwordText = new JPasswordField(10);
     private final JButton loginButton = new JButton("Login");
+    private final JButton backButton = new JButton("Back");
 
     public LoginView(LoginViewModel loginViewModel) {
         this.loginViewModel = loginViewModel;
@@ -41,11 +43,14 @@ public class LoginView {
         mainPanel.add(usernamePanel);
         mainPanel.add(passwordPanel);
         mainPanel.add(loginButton);
+        mainPanel.add(backButton);
 
         frame.add(mainPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
         frame.pack();
+
+        JFrame newFrame = new JFrame("Incorrect username or password!");
 
         loginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -73,7 +78,7 @@ public class LoginView {
                     }
 
                     try {
-                        JFrame newFrame = new JFrame("Incorrect username or password!");
+//                        JFrame newFrame = new JFrame("Incorrect username or password!");
                         if (!checkLogin(usernameText.getText(), passwordText.getText())) {
                             JPanel incorrect = new JPanel();
                             incorrect.setLayout(new BoxLayout(incorrect, BoxLayout.Y_AXIS));
@@ -98,6 +103,22 @@ public class LoginView {
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     }
+                }
+            }
+        });
+
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (e.getSource().equals(backButton)) {
+
+                    LoginController loginController = new LoginController();
+                    try {
+                        loginController.goBack();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    frame.dispose();
+                    newFrame.dispose();
                 }
             }
         });
