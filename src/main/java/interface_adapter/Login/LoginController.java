@@ -1,15 +1,18 @@
 package interface_adapter.Login;
 
 import entity.Player;
+import interface_adapter.HomeScreen.HomeScreenViewModel;
 import interface_adapter.Loggedin.LoggedInController;
 import interface_adapter.Loggedin.LoggedInViewModel;
 import interface_adapter.Preferences.PreferencesController;
 import interface_adapter.Preferences.PreferencesViewModel;
 import use_case.login.LoginInteractor;
+import view.HomeScreenView;
 import view.LoggedInView;
 import view.PreferencesView;
 
 
+import javax.swing.*;
 import java.io.IOException;
 
 public class LoginController {
@@ -78,5 +81,10 @@ public class LoginController {
         player.setDifficulty(difficulty);
         player.setType(types);
         player.setNumQuestions(numQuestions);
+    }
+
+    public void goBack() throws IOException {
+        HomeScreenView homeScreenView = new HomeScreenView(new HomeScreenViewModel());
+        homeScreenView.display();
     }
 }
