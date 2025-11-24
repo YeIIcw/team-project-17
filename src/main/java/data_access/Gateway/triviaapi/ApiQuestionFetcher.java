@@ -98,8 +98,8 @@ public class ApiQuestionFetcher implements QuestionFetcher {
             JSONObject obj = questionsArray.getJSONObject(i);
 
             String qType         = obj.getString("type");        // "multiple" or "boolean"
-            String questionText  = obj.getString("question");
-            String correctAnswer = obj.getString("correct_answer");
+            String questionText  = decodeHtmlEntities(obj.getString("question"));
+            String correctAnswer = decodeHtmlEntities(obj.getString("correct_answer"));
             JSONArray incorrect  = obj.getJSONArray("incorrect_answers");
 
             ArrayList<String> choices = new ArrayList<>();
@@ -112,7 +112,7 @@ public class ApiQuestionFetcher implements QuestionFetcher {
             } else {
                 choices.add(correctAnswer);
                 for (int j = 0; j < incorrect.length(); j++) {
-                    choices.add(incorrect.getString(j));
+                    choices.add(decodeHtmlEntities(incorrect.getString(j)));
                 }
                 correctIndex = 0;
             }
@@ -138,6 +138,20 @@ public class ApiQuestionFetcher implements QuestionFetcher {
             default:
                 return 1;
         }
+    }
+
+    private String decodeHtmlEntities(String text) {
+        return text
+                .replace("&quot;", "\"")
+                .replace("&#039;", "'")
+                .replace("&amp;", "&")
+                .replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&apos;", "'")
+                .replace("&rsquo;", "'")
+                .replace("&lsquo;", "'")
+                .replace("&rdquo;", "\"")
+                .replace("&ldquo;", "\"");
     }
 
     public String buildTriviaUrl(String category, String difficulty, String type, int numQuestions) {
