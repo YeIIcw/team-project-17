@@ -15,6 +15,15 @@ public class GameState {
 
     private int score;
 
+    private int xp = 0;
+    private int enemyIndex = 1;
+
+    private Character player;
+    private Enemy currentEnemy;
+
+    private int enemiesDefeated;
+
+
 //    private CombatState currentCombat;         // null when not in combat
 //
 //    private GamePhase phase;                   // EXPLORATION, QUESTION, COMBAT, GAME_OVER
@@ -25,6 +34,10 @@ public class GameState {
         this.position = new Position(0, 0);
         this.currentQuestionIndex = 0;
         this.score = 0;
+        // initialize player and first enemy
+        this.player = new Character(100, 10, 5);    // base values
+        this.currentEnemy = new Enemy(50, 5);       // first enemy base stats
+
     }
 
     // NOTE: already set in PreferencesInteractor by making API calls; thus not in the constructor
@@ -73,4 +86,43 @@ public class GameState {
 //    }
 
     // getters / setters / methods to move player, start combat, etc.
+    public Character getPlayer() {
+        return player;
+    }
+
+    public Enemy getCurrentEnemy() {
+        return currentEnemy;
+    }
+
+    public void addXP(int amount) {
+        xp += amount;
+    }
+
+    public int getXP() {
+        return xp;
+    }
+
+    public void resetPlayerHealth() {
+        player.setHealth(100);
+    }
+
+    public void nextEnemy() {
+        enemyIndex++;
+        int hp = 50 + enemyIndex * 30;
+        int dmg = 5 + enemyIndex * 3;
+        currentEnemy = new Enemy(hp, dmg);
+    }
+
+    public int getEnemyIndex() {
+        return enemyIndex;
+    }
+
+    public void incrementEnemiesDefeated() {
+        enemiesDefeated++;
+    }
+
+    public int getEnemiesDefeated() {
+        return enemiesDefeated;
+    }
+
 }

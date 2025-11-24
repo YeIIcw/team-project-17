@@ -2,3 +2,5 @@ username, password, points
 test, test, 0
 abc, abc, 0
 cc, cc, 0
+polat, 31, 0
+ediz, 31, 0

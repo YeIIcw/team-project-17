@@ -31,12 +31,12 @@ public class PreferencesInteractor implements PreferencesInputBoundary {
         System.out.println("  Category: " + input.getCategory());
         System.out.println("  Difficulty: " + input.getDifficulty());
         System.out.println("  Type: " + input.getType());
-        System.out.println("  NumQuestions: " + input.getNumQuestions());
-        
+        System.out.println("  NumQuestions: " + 50);
+
         int categoryId = mapCategoryNameToId(input.getCategory());
         String difficultyParam = input.getDifficulty().toLowerCase(); // "easy"
         String typeParam = input.getType().equals("Multiple Choice") ? "multiple" : "boolean";
-        int amount = input.getNumQuestions();
+        int amount = 50;
 
         System.out.println("DEBUG: PreferencesInteractor - Mapped parameters:");
         System.out.println("  Category ID: " + categoryId);
