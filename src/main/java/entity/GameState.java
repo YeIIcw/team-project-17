@@ -40,7 +40,30 @@ public class GameState {
     }
 
     public boolean hasMoreQuestions() {
-        return currentQuestionIndex < questions.size();
+        return questions != null && currentQuestionIndex < questions.size();
+    }
+
+    public void moveToNextQuestion() {
+        if (hasMoreQuestions()) {
+            currentQuestionIndex++;
+        }
+    }
+
+    public void addScore(int points) {
+        this.score += points;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public int getCurrentQuestionIndex() {
+        return currentQuestionIndex;
+    }
+
+    public void reset() {
+        this.currentQuestionIndex = 0;
+        this.score = 0;
     }
 
 //    public boolean isGameOver() {

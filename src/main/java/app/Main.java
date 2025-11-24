@@ -28,6 +28,9 @@ public class Main {
                     .addLoggedInUseCase()
                     .addLoggedInView()
 
+                    .addGameplayView()
+                    .addGameplayUseCase()
+
                     .build();
         });
     }

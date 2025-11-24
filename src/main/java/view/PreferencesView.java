@@ -70,10 +70,18 @@ public class PreferencesView {
         frame.pack();
 
         doneButton.addActionListener(e -> {
+            System.out.println("DEBUG: PreferencesView - Done button clicked");
+            
             String categoryChoice   = (String) categoriesDropdown.getSelectedItem();
             String difficultyChoice = (String) difficultyDropdown.getSelectedItem();
             String typeChoice       = (String) typesDropdown.getSelectedItem();
             int numQuestionChoice   = Integer.parseInt((String) numQuestionDropdown.getSelectedItem());
+
+            System.out.println("DEBUG: PreferencesView - Selected preferences:");
+            System.out.println("  Category: " + categoryChoice);
+            System.out.println("  Difficulty: " + difficultyChoice);
+            System.out.println("  Type: " + typeChoice);
+            System.out.println("  Number of Questions: " + numQuestionChoice);
 
             // ViewModel can be updated here
             preferencesViewModel.setCategory(categoryChoice);
@@ -83,25 +91,30 @@ public class PreferencesView {
 
             // Use injected controller
             if (preferencesController != null) {
+                System.out.println("DEBUG: PreferencesView - Calling PreferencesController.execute()");
                 preferencesController.execute(
                         categoryChoice,
                         difficultyChoice,
                         typeChoice,
                         numQuestionChoice
                 );
+                System.out.println("DEBUG: PreferencesView - PreferencesController.execute() completed");
+            } else {
+                System.out.println("ERROR: PreferencesView - preferencesController is null!");
             }
 
-            // optional: inspect ViewModel for success / error
-            if (!preferencesViewModel.isSuccess() && preferencesViewModel.getMessage() != null) {
-                JOptionPane.showMessageDialog(frame, preferencesViewModel.getMessage());
-            } else {
-                frame.dispose(); // move to next screen
-            }
+            // Note: Frame disposal is now handled by the callback in PreferencesPresenter
+            // Don't dispose here because API call is asynchronous
+            System.out.println("DEBUG: PreferencesView - Waiting for API response...");
         });
     }
 
     public void setPreferencesController(PreferencesController controller) {
         this.preferencesController = controller;
+    }
+
+    public JFrame getFrame() {
+        return frame;
     }
 
     public void display() {

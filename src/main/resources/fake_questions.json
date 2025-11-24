@@ -1,0 +1,86 @@
+{
+  "response_code": 0,
+  "results": [
+    {
+      "type": "multiple",
+      "difficulty": "easy",
+      "category": "General Knowledge",
+      "question": "What is the capital of France?",
+      "correct_answer": "Paris",
+      "incorrect_answers": ["London", "Berlin", "Madrid"]
+    },
+    {
+      "type": "multiple",
+      "difficulty": "easy",
+      "category": "General Knowledge",
+      "question": "What is 2 + 2?",
+      "correct_answer": "4",
+      "incorrect_answers": ["3", "5", "6"]
+    },
+    {
+      "type": "multiple",
+      "difficulty": "easy",
+      "category": "General Knowledge",
+      "question": "What is the largest planet in our solar system?",
+      "correct_answer": "Jupiter",
+      "incorrect_answers": ["Saturn", "Neptune", "Earth"]
+    },
+    {
+      "type": "boolean",
+      "difficulty": "easy",
+      "category": "General Knowledge",
+      "question": "The sky is blue.",
+      "correct_answer": "True",
+      "incorrect_answers": ["False"]
+    },
+    {
+      "type": "multiple",
+      "difficulty": "medium",
+      "category": "General Knowledge",
+      "question": "Who wrote the novel '1984'?",
+      "correct_answer": "George Orwell",
+      "incorrect_answers": ["Aldous Huxley", "Ray Bradbury", "J.D. Salinger"]
+    },
+    {
+      "type": "multiple",
+      "difficulty": "medium",
+      "category": "General Knowledge",
+      "question": "What is the chemical symbol for gold?",
+      "correct_answer": "Au",
+      "incorrect_answers": ["Go", "Gd", "Ag"]
+    },
+    {
+      "type": "boolean",
+      "difficulty": "medium",
+      "category": "General Knowledge",
+      "question": "Python is a programming language.",
+      "correct_answer": "True",
+      "incorrect_answers": ["False"]
+    },
+    {
+      "type": "multiple",
+      "difficulty": "hard",
+      "category": "General Knowledge",
+      "question": "In which year did World War II end?",
+      "correct_answer": "1945",
+      "incorrect_answers": ["1944", "1946", "1947"]
+    },
+    {
+      "type": "multiple",
+      "difficulty": "hard",
+      "category": "General Knowledge",
+      "question": "What is the speed of light in vacuum?",
+      "correct_answer": "299,792,458 m/s",
+      "incorrect_answers": ["300,000,000 m/s", "299,000,000 m/s", "298,792,458 m/s"]
+    },
+    {
+      "type": "boolean",
+      "difficulty": "hard",
+      "category": "General Knowledge",
+      "question": "The human body has 206 bones.",
+      "correct_answer": "True",
+      "incorrect_answers": ["False"]
+    }
+  ]
+}
+
