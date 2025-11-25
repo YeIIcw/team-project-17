@@ -3,6 +3,8 @@ package app;
 import data_access.Gateway.triviaapi.FakeQuestionFetcher;
 import data_access.Gateway.triviaapi.QuestionFetcher;
 
+import data_access_object.InMemoryLeaderboardDataAccessObject;
+
 import entity.GameState;
 
 import interface_adapter.AccountCreated.AccountCreatedViewModel;
@@ -25,9 +27,17 @@ import interface_adapter.Combat.CombatController;
 import interface_adapter.Combat.CombatPresenter;
 import interface_adapter.Combat.CombatViewModel;
 
+import interface_adapter.leaderboard.LeaderboardController;
+import interface_adapter.leaderboard.LeaderboardPresenter;
+
 import use_case.gameplay.GameplayInputBoundary;
 import use_case.gameplay.GameplayInteractor;
 import use_case.gameplay.GameplayOutputBoundary;
+
+import use_case.leaderboard.LeaderboardDataAccessInterface;
+import use_case.leaderboard.LeaderboardInputBoundary;
+import use_case.leaderboard.LeaderboardInteractor;
+import use_case.leaderboard.LeaderboardOutputBoundary;
 
 import use_case.preferences.PreferencesInputBoundary;
 import use_case.preferences.PreferencesInteractor;
@@ -70,6 +80,8 @@ public class AppBuilder {
     private CombatController combatController;
     private CombatInteractor combatInteractor;
     private CombatPresenter combatPresenter;
+
+    private LeaderboardController leaderboardController;
 
     private GameState gameState;
     private LoggedInController loggedInController;
@@ -264,6 +276,17 @@ public class AppBuilder {
         GameplayController controller = new GameplayController(interactor);
 
         gameplayView = new GameplayView(gameplayViewModel, controller);
+        return this;
+    }
+
+    public AppBuilder addLeaderboardUseCase() {
+        System.out.println("DEBUG: AppBuilder - leaderboard system");
+
+        LeaderboardDataAccessInterface dataAccess = new InMemoryLeaderboardDataAccessObject();
+        LeaderboardOutputBoundary presenter = new LeaderboardPresenter();
+        LeaderboardInputBoundary interactor = new LeaderboardInteractor(dataAccess, presenter);
+        this.leaderboardController = new LeaderboardController(interactor);
+
         return this;
     }
 
