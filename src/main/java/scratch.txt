@@ -4,3 +4,4 @@ abc, abc, 0
 cc, cc, 0
 polat, 31, 0
 ediz, 31, 0
+123, 123, 0

@@ -1,6 +1,6 @@
 package app;
 
-import data_access.Gateway.triviaapi.FakeQuestionFetcher;
+import data_access.Gateway.triviaapi.ApiQuestionFetcher;
 import data_access.Gateway.triviaapi.QuestionFetcher;
 
 import entity.GameState;
@@ -176,7 +176,7 @@ public class AppBuilder {
     }
 
     public AppBuilder addPreferencesUseCase() {
-        QuestionFetcher questionFetcher = new FakeQuestionFetcher();
+        QuestionFetcher questionFetcher = new ApiQuestionFetcher();
         System.out.println("DEBUG: AppBuilder - Using FakeQuestionFetcher");
 
         Map<String, Integer> categoryMap = new HashMap<>();

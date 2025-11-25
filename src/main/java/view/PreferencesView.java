@@ -15,23 +15,22 @@ public class PreferencesView {
     private final JLabel categoryLabel = new JLabel("Category:");
     private final JLabel difficultyLabel = new JLabel("Difficulty");
     private final JLabel typeLabel = new JLabel("Type:");
-
-    // REMOVED: Number of questions label + dropdown
-    // private final JLabel numQuestionLabel = new JLabel("Number of Questions:");
+    private final JLabel numQuestionLabel = new JLabel("Number of Questions:");
 
     String[] categories = {"General Knowledge", "Entertainment: Books", "Entertainment: Film", "Entertainment: Music",
             "Entertainment: Musicals & Theatres", "Entertainment: Television", "Entertainment: Video Games",
-            "Entertainment: Board Games", "Science & Nature", "Science: Computers", "Science: Mathematics",
+            "Entertainment: Board Games", "Science & Nature", "Science: Computers", "Science: Mathematics, ",
             "Mythology", "Sports", "Geography", "History", "Politics", "Art", "Celebrities", "Animals", "Vehicles",
             "Entertainment: Comics", "Science: Gadgets", "Entertainment: Japanese Anime & Manga",
             "Entertainment: Cartoon & Animations"};
-
     String[] difficulties = {"Easy", "Medium", "Hard"};
     String[] types = {"Multiple Choice", "True/False"};
+    String[] numQuestions = {"5", "10", "15", "20"};
 
     private final JComboBox<String> categoriesDropdown = new JComboBox<>(categories);
     private final JComboBox<String> difficultyDropdown = new JComboBox<>(difficulties);
     private final JComboBox<String> typesDropdown = new JComboBox<>(types);
+    private final JComboBox<String> numQuestionDropdown = new JComboBox<>(numQuestions);
 
     private final JButton doneButton = new JButton("Done");
 
@@ -50,10 +49,9 @@ public class PreferencesView {
         type.add(typeLabel);
         type.add(typesDropdown);
 
-        // REMOVED question panel
-        // JPanel question = new JPanel();
-        // question.add(numQuestionLabel);
-        // question.add(numQuestionDropdown);
+        JPanel question = new JPanel();
+        question.add(numQuestionLabel);
+        question.add(numQuestionDropdown);
 
         JPanel done = new JPanel();
         done.add(doneButton);
@@ -63,9 +61,7 @@ public class PreferencesView {
         mainPanel.add(category);
         mainPanel.add(difficulty);
         mainPanel.add(type);
-
-        // REMOVED: mainPanel.add(question);
-
+        mainPanel.add(question);
         mainPanel.add(done);
 
         frame.add(mainPanel);
@@ -79,32 +75,36 @@ public class PreferencesView {
             String categoryChoice   = (String) categoriesDropdown.getSelectedItem();
             String difficultyChoice = (String) difficultyDropdown.getSelectedItem();
             String typeChoice       = (String) typesDropdown.getSelectedItem();
+            int numQuestionChoice   = Integer.parseInt((String) numQuestionDropdown.getSelectedItem());
 
             System.out.println("DEBUG: PreferencesView - Selected preferences:");
             System.out.println("  Category: " + categoryChoice);
             System.out.println("  Difficulty: " + difficultyChoice);
             System.out.println("  Type: " + typeChoice);
-            System.out.println("  Number of Questions: (IGNORED → 50 MAX)");
+            System.out.println("  Number of Questions: " + numQuestionChoice);
 
-            // Update ViewModel
+            // ViewModel can be updated here
             preferencesViewModel.setCategory(categoryChoice);
             preferencesViewModel.setDifficulty(difficultyChoice);
             preferencesViewModel.setType(typeChoice);
-            preferencesViewModel.setNumQuestions(50); // always max
+            preferencesViewModel.setNumQuestions(numQuestionChoice);
 
+            // Use injected controller
             if (preferencesController != null) {
                 System.out.println("DEBUG: PreferencesView - Calling PreferencesController.execute()");
                 preferencesController.execute(
                         categoryChoice,
                         difficultyChoice,
                         typeChoice,
-                        50 // always max
+                        numQuestionChoice
                 );
                 System.out.println("DEBUG: PreferencesView - PreferencesController.execute() completed");
             } else {
                 System.out.println("ERROR: PreferencesView - preferencesController is null!");
             }
 
+            // Note: Frame disposal is now handled by the callback in PreferencesPresenter
+            // Don't dispose here because API call is asynchronous
             System.out.println("DEBUG: PreferencesView - Waiting for API response...");
         });
     }
