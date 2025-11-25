@@ -1,8 +1,8 @@
 package entity;
 
 public class ScoreEntry {
-    private String username;
-    private int score;
+    private final String username;
+    private final int score;
 
     public ScoreEntry(String username, int score) {
         this.username = username;
