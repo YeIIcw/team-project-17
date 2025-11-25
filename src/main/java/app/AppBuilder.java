@@ -6,6 +6,7 @@ import data_access.Gateway.triviaapi.QuestionFetcher;
 import data_access_object.InMemoryLeaderboardDataAccessObject;
 
 import entity.GameState;
+import entity.ScoreEntry;
 
 import interface_adapter.AccountCreated.AccountCreatedViewModel;
 import interface_adapter.HomeScreen.HomeScreenViewModel;
@@ -129,6 +130,10 @@ public class AppBuilder {
                 String testUsername = "TestPlayer";
                 leaderboardController.execute(testUsername, finalScore);
                 System.out.println("DEBUG: Score saved for " + testUsername + ": " + finalScore);
+
+                System.out.println("DEBUG: Showing leaderboard");
+                leaderboardController.showLeaderboard();
+
             } else {
                 System.out.println("DEBUG: LeaderboardController is null");
             }
@@ -291,6 +296,12 @@ public class AppBuilder {
         System.out.println("DEBUG: AppBuilder - leaderboard system");
 
         LeaderboardDataAccessInterface dataAccess = new InMemoryLeaderboardDataAccessObject();
+
+        // testing leaderboard -- delete later
+        dataAccess.saveScore(new ScoreEntry("Champion", 5000));
+        dataAccess.saveScore(new ScoreEntry("Pro", 4200));
+        dataAccess.saveScore(new ScoreEntry("Rookie", 1800));
+
         LeaderboardOutputBoundary presenter = new LeaderboardPresenter();
         LeaderboardInputBoundary interactor = new LeaderboardInteractor(dataAccess, presenter);
         this.leaderboardController = new LeaderboardController(interactor);

@@ -2,6 +2,9 @@ package use_case.leaderboard;
 
 import entity.ScoreEntry;
 
+import java.util.Comparator;
+import java.util.List;
+
 public class LeaderboardInteractor implements LeaderboardInputBoundary{
     private final LeaderboardDataAccessInterface dataAccess;
     private final LeaderboardOutputBoundary outputBoundary;
@@ -24,6 +27,22 @@ public class LeaderboardInteractor implements LeaderboardInputBoundary{
         } catch (Exception e) {
             LeaderboardOutputData outputData =
                     new LeaderboardOutputData("Failed to save score: " + e.getMessage(), false);
+            outputBoundary.prepareFailView(outputData);
+        }
+    }
+
+    @Override
+    public void showLeaderboard() {
+        try {
+            List<ScoreEntry> allScores = dataAccess.getAllScores();
+            List<ScoreEntry> sortedScores = allScores.stream()
+                    .sorted(Comparator.comparingInt(ScoreEntry::getScore).reversed())
+                    .limit(3)
+                    .toList();
+
+            outputBoundary.prepareLeaderboardView(sortedScores);
+        } catch (Exception e) {
+            LeaderboardOutputData outputData = new LeaderboardOutputData("Failed to load leaderboard", false);
             outputBoundary.prepareFailView(outputData);
         }
     }

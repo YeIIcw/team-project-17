@@ -14,4 +14,8 @@ public class LeaderboardController {
         LeaderboardInputData inputData = new LeaderboardInputData(username, score);
         leaderboardUseCaseInteractor.saveScore(inputData);
     }
+
+    public void showLeaderboard() {
+        leaderboardUseCaseInteractor.showLeaderboard();
+    }
 }
