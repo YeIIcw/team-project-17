@@ -177,7 +177,7 @@ public class AppBuilder {
 
     public AppBuilder addPreferencesUseCase() {
         QuestionFetcher questionFetcher = new ApiQuestionFetcher();
-        System.out.println("DEBUG: AppBuilder - Using FakeQuestionFetcher");
+        System.out.println("DEBUG: AppBuilder - Using ApiQuestionFetcher for live API calls");
 
         Map<String, Integer> categoryMap = new HashMap<>();
         categoryMap.put("General Knowledge", 9);

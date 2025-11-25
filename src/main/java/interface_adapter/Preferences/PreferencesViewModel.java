@@ -1,5 +1,7 @@
 package interface_adapter.Preferences;
 
+import view.PreferencesView;
+
 public class PreferencesViewModel {
 
     private String category;
@@ -22,4 +24,7 @@ public class PreferencesViewModel {
     public void setNumQuestions(int numQuestions)  { this.numQuestions = numQuestions; }
     public void setSuccess(boolean success)        { this.success = success; }
     public void setMessage(String message)         { this.message = message; }
+
+    public void addPropertyChangeListener(PreferencesView preferencesView) {
+    }
 }
