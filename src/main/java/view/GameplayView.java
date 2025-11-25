@@ -84,7 +84,7 @@ public class GameplayView {
         frame.add(resultPanel, BorderLayout.SOUTH);
         frame.add(buttonPanel, BorderLayout.PAGE_END);
 
-        frame.setSize(800, 600);
+        frame.setSize(650, 550);
         frame.setLocationRelativeTo(null);
     }
 
