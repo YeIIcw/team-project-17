@@ -50,7 +50,7 @@ public class PreferencesPresenter implements PreferencesOutputBoundary {
 
             // Provide a friendly, professional error message
             if (errorMessage != null && errorMessage.contains("Could not load questions")) {
-                errorMessage = "We're sorry, but there aren't enough questions available for your selected preferences.\n\n" +
+                errorMessage = "There aren't enough questions available for your selected preferences.\n\n" +
                         "Please try:\n" +
                         "  • Selecting a different category\n" +
                         "  • Choosing fewer questions\n" +
