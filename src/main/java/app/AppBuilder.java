@@ -125,6 +125,14 @@ public class AppBuilder {
             int enemiesDefeated = gameState.getEnemyIndex();
             int finalScore = gameState.getScore();
 
+            if (leaderboardController != null) {
+                String testUsername = "TestPlayer";
+                leaderboardController.execute(testUsername, finalScore);
+                System.out.println("DEBUG: Score saved for " + testUsername + ": " + finalScore);
+            } else {
+                System.out.println("DEBUG: LeaderboardController is null");
+            }
+
             GameOverView gov = new GameOverView(this, gameState.getScore(), gameState.getEnemiesDefeated());
             gov.display();
         });
