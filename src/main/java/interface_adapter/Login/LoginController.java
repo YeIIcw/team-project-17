@@ -4,11 +4,8 @@ import entity.Player;
 import interface_adapter.Loggedin.LoggedInController;
 import interface_adapter.Loggedin.LoggedInViewModel;
 import interface_adapter.Preferences.PreferencesController;
-import interface_adapter.Preferences.PreferencesViewModel;
 import use_case.login.LoginInteractor;
 import view.LoggedInView;
-import view.PreferencesView;
-
 
 import java.io.IOException;
 
@@ -48,26 +45,20 @@ public class LoginController {
         this.player = loginInteractor.getPlayer();
         System.out.println("DEBUG: LoginController - Player created: " + username);
 
-        // Use the LoggedInController from AppBuilder if available (it has the correct PreferencesView)
-        // Otherwise create a new PreferencesView and LoggedInController
+        // Verify we have the necessary controllers
         if (loggedInController == null) {
-            System.out.println("DEBUG: LoginController - Creating new PreferencesView and LoggedInController");
-            PreferencesViewModel preferencesViewModel = new PreferencesViewModel();
-            PreferencesView preferencesView = new PreferencesView(preferencesViewModel);
-            
-            if (preferencesController != null) {
-                System.out.println("DEBUG: LoginController - Setting PreferencesController on PreferencesView");
-                preferencesView.setPreferencesController(preferencesController);
-            } else {
-                System.out.println("ERROR: LoginController - preferencesController is null! PreferencesView won't work.");
-            }
-            
-            // Create LoggedInController with the PreferencesView
-            loggedInController = new LoggedInController(preferencesView);
-        } else {
-            System.out.println("DEBUG: LoginController - Using provided LoggedInController (has correct PreferencesView)");
+            System.out.println("ERROR: LoginController - loggedInController is null!");
+            throw new IllegalStateException("LoggedInController must be set before login");
         }
 
+        if (preferencesController == null) {
+            System.out.println("ERROR: LoginController - preferencesController is null!");
+            throw new IllegalStateException("PreferencesController must be set before login");
+        }
+
+        System.out.println("DEBUG: LoginController - Using LoggedInController from AppBuilder");
+
+        // Create and display LoggedInView using the properly wired controller
         LoggedInView loggedInView = new LoggedInView(new LoggedInViewModel(), loggedInController);
         System.out.println("DEBUG: LoginController - Displaying LoggedInView");
         loggedInView.display();

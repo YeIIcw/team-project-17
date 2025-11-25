@@ -27,7 +27,7 @@ public class GameState {
         this.score = 0;
     }
 
-    // NOTE: already set in PreferencesInteractor by making API calls; thus not in the constructor
+    // ❗️ NOTE: already set in PreferencesInteractor by making API calls; thus not in the constructor
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
     }

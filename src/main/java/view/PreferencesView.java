@@ -25,7 +25,7 @@ public class PreferencesView {
             "Entertainment: Cartoon & Animations"};
     String[] difficulties = {"Easy", "Medium", "Hard"};
     String[] types = {"Multiple Choice", "True/False"};
-    String[] numQuestions = {"10", "20", "30", "40", "50"};
+    String[] numQuestions = {"5", "10", "15", "20"};
 
     private final JComboBox<String> categoriesDropdown = new JComboBox<>(categories);
     private final JComboBox<String> difficultyDropdown = new JComboBox<>(difficulties);
