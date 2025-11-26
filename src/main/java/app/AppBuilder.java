@@ -84,6 +84,7 @@ public class AppBuilder {
     private CombatPresenter combatPresenter;
 
     private LeaderboardController leaderboardController;
+    private LeaderboardView leaderboardView;
 
     private GameState gameState;
     private LoggedInController loggedInController;
@@ -140,6 +141,7 @@ public class AppBuilder {
             }
 
             GameOverView gov = new GameOverView(this, gameState.getScore(), gameState.getEnemiesDefeated());
+            gov.setLeaderboardView(leaderboardView);
             gov.display();
         });
 
@@ -297,16 +299,16 @@ public class AppBuilder {
         System.out.println("DEBUG: AppBuilder - leaderboard system");
 
         LeaderboardDataAccessInterface dataAccess = new InMemoryLeaderboardDataAccessObject();
-
-        // testing leaderboard -- delete later
-//        dataAccess.saveScore(new ScoreEntry("Champion", 5000));
-//        dataAccess.saveScore(new ScoreEntry("Pro", 4200));
-//        dataAccess.saveScore(new ScoreEntry("Rookie", 1800));
-
         LeaderboardViewModel viewModel = new LeaderboardViewModel();
         LeaderboardOutputBoundary presenter = new LeaderboardPresenter(viewModel);
         LeaderboardInputBoundary interactor = new LeaderboardInteractor(dataAccess, presenter);
-        this.leaderboardController = new LeaderboardController(interactor);
+        LeaderboardController controller = new LeaderboardController(interactor);
+
+        LeaderboardView leaderboardView = new LeaderboardView(viewModel);
+        leaderboardView.setLeaderboardController(controller);
+
+        this.leaderboardController = controller;
+        this.leaderboardView = leaderboardView;
 
         return this;
     }
