@@ -1,5 +1,6 @@
 package interface_adapter.Login;
 
+import entity.GameState;
 import entity.Player;
 import interface_adapter.HomeScreen.HomeScreenViewModel;
 import interface_adapter.Loggedin.LoggedInController;
@@ -22,6 +23,7 @@ public class LoginController {
     private Player player;
     private LoggedInController loggedInController;
     private PreferencesController preferencesController;
+    private GameState gameState;
 
     public LoginController() {
         // Default constructor for backward compatibility
@@ -30,6 +32,10 @@ public class LoginController {
     public LoginController(LoggedInController loggedInController, PreferencesController preferencesController) {
         this.loggedInController = loggedInController;
         this.preferencesController = preferencesController;
+    }
+
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
     }
 
     public void setLoggedInController(LoggedInController loggedInController) {
@@ -42,6 +48,14 @@ public class LoginController {
 
     public void execute(String username, String password) throws IOException {
         System.out.println("DEBUG: LoginController - execute() called");
+
+        if (gameState != null) {
+            gameState.setCurrentUsername(username);
+            System.out.println("DEBUG: Username '" + username + "' set in GameState");
+        } else {
+            System.out.println("DEBUG: gameState is null, cannot set username");
+        }
+
         this.username = username;
         this.password = password;
 

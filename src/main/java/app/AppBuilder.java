@@ -129,16 +129,26 @@ public class AppBuilder {
             int finalScore = gameState.getScore();
 
             if (leaderboardController != null) {
-                String testUsername = "TestPlayer";
-                leaderboardController.execute(testUsername, finalScore);
-                System.out.println("DEBUG: Score saved for " + testUsername + ": " + finalScore);
+                String usernameToUse = gameState.getCurrentUsername();
+                System.out.println("DEBUG: Using username from GameState: " + usernameToUse);
 
-                System.out.println("DEBUG: Showing leaderboard");
+                leaderboardController.execute(usernameToUse, finalScore);
+                System.out.println("DEBUG: Score saved for " + usernameToUse + ": " + finalScore);
                 leaderboardController.showLeaderboard();
-
             } else {
                 System.out.println("DEBUG: LeaderboardController is null");
             }
+
+//                String testUsername = "TestPlayer";
+//                leaderboardController.execute(testUsername, finalScore);
+//                System.out.println("DEBUG: Score saved for " + testUsername + ": " + finalScore);
+//
+//                System.out.println("DEBUG: Showing leaderboard");
+//                leaderboardController.showLeaderboard();
+//
+//            } else {
+//                System.out.println("DEBUG: LeaderboardController is null");
+//            }
 
             GameOverView gov = new GameOverView(this, gameState.getScore(), gameState.getEnemiesDefeated());
             gov.setLeaderboardView(leaderboardView);
@@ -169,7 +179,7 @@ public class AppBuilder {
 
     public AppBuilder addLoginView() {
         loginViewModel = new LoginViewModel();
-        loginView = new LoginView(loginViewModel);
+        loginView = new LoginView(loginViewModel, gameState);
         return this;
     }
 
@@ -273,7 +283,7 @@ public class AppBuilder {
         loggedInView = new LoggedInView(loggedInViewModel, loggedInController);
 
         if (homeScreenView != null && loginView != null && signupView != null) {
-            var homeCtrl = new interface_adapter.HomeScreen.HomeScreenController(loginView, signupView);
+            var homeCtrl = new interface_adapter.HomeScreen.HomeScreenController(loginView, signupView, gameState);
             homeScreenView.setHomeScreenController(homeCtrl);
         }
 
