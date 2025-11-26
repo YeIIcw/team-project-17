@@ -79,13 +79,11 @@ public class ApiQuestionFetcher implements QuestionFetcher {
         }
     }
 
-
-    // Package-private so tests in the same package can call it
     List<Question> parseQuestionsFromJson(String json) throws JSONException {
         JSONObject responseBody = new JSONObject(json);
 
         int responseCode = responseBody.getInt("response_code");
-        if (responseBody.getInt("response_code") != SUCCESS_CODE) {
+        if (responseCode != SUCCESS_CODE) {
             System.out.println("DEBUG - OpenTDB response_code != 0. response_code = " + responseCode);
             System.out.println("DEBUG - Full JSON: " + json);
             throw new JSONException("Non-success response_code");
@@ -97,24 +95,28 @@ public class ApiQuestionFetcher implements QuestionFetcher {
         for (int i = 0; i < questionsArray.length(); i++) {
             JSONObject obj = questionsArray.getJSONObject(i);
 
-            String qType         = obj.getString("type");        // "multiple" or "boolean"
-            String questionText  = obj.getString("question");
-            String correctAnswer = obj.getString("correct_answer");
+            String qType         = obj.getString("type");
+            String questionText  = decodeHtmlEntities(obj.getString("question"));
+            String correctAnswer = decodeHtmlEntities(obj.getString("correct_answer"));
             JSONArray incorrect  = obj.getJSONArray("incorrect_answers");
 
             ArrayList<String> choices = new ArrayList<>();
             int correctIndex;
 
             if ("boolean".equals(qType)) {
+                // True/False questions - don't shuffle, standard order
                 choices.add("True");
                 choices.add("False");
                 correctIndex = "True".equals(correctAnswer) ? 0 : 1;
             } else {
+                // Multiple choice - add all choices, then shuffle
                 choices.add(correctAnswer);
                 for (int j = 0; j < incorrect.length(); j++) {
-                    choices.add(incorrect.getString(j));
+                    choices.add(decodeHtmlEntities(incorrect.getString(j)));
                 }
-                correctIndex = 0;
+
+                // Shuffle and get new correct index
+                correctIndex = shuffleChoices(choices);
             }
 
             int scoreValue = computeScore(obj.getString("difficulty"));
@@ -147,4 +149,40 @@ public class ApiQuestionFetcher implements QuestionFetcher {
                 "&difficulty=" + difficulty + // "easy", "medium", "hard"
                 "&type=" + type;              // "multiple" or "boolean"
     }
+
+    /**
+     * Shuffles the choices list and returns the new index of the correct answer (first element)
+     */
+    private int shuffleChoices(ArrayList<String> choices) {
+        if (choices.size() <= 1) {
+            return 0;
+        }
+
+        // Store the correct answer (first element)
+        String correctAnswer = choices.get(0);
+
+        // Shuffle the list
+        java.util.Collections.shuffle(choices);
+
+        // Find the new index of the correct answer
+        return choices.indexOf(correctAnswer);
+    }
+
+    /**
+     * Decodes HTML entities to normal characters
+     */
+    private String decodeHtmlEntities(String text) {
+        return text
+                .replace("&quot;", "\"")
+                .replace("&#039;", "'")
+                .replace("&amp;", "&")
+                .replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&apos;", "'")
+                .replace("&rsquo;", "'")
+                .replace("&lsquo;", "'")
+                .replace("&rdquo;", "\"")
+                .replace("&ldquo;", "\"");
+    }
 }
+
