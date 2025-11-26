@@ -30,6 +30,7 @@ import interface_adapter.Combat.CombatViewModel;
 
 import interface_adapter.leaderboard.LeaderboardController;
 import interface_adapter.leaderboard.LeaderboardPresenter;
+import interface_adapter.leaderboard.LeaderboardViewModel;
 
 import use_case.gameplay.GameplayInputBoundary;
 import use_case.gameplay.GameplayInteractor;
@@ -298,11 +299,12 @@ public class AppBuilder {
         LeaderboardDataAccessInterface dataAccess = new InMemoryLeaderboardDataAccessObject();
 
         // testing leaderboard -- delete later
-        dataAccess.saveScore(new ScoreEntry("Champion", 5000));
-        dataAccess.saveScore(new ScoreEntry("Pro", 4200));
-        dataAccess.saveScore(new ScoreEntry("Rookie", 1800));
+//        dataAccess.saveScore(new ScoreEntry("Champion", 5000));
+//        dataAccess.saveScore(new ScoreEntry("Pro", 4200));
+//        dataAccess.saveScore(new ScoreEntry("Rookie", 1800));
 
-        LeaderboardOutputBoundary presenter = new LeaderboardPresenter();
+        LeaderboardViewModel viewModel = new LeaderboardViewModel();
+        LeaderboardOutputBoundary presenter = new LeaderboardPresenter(viewModel);
         LeaderboardInputBoundary interactor = new LeaderboardInteractor(dataAccess, presenter);
         this.leaderboardController = new LeaderboardController(interactor);
 
