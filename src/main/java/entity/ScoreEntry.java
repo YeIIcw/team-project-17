@@ -1,10 +1,10 @@
-package use_case.leaderboard;
+package entity;
 
-public class LeaderboardInputData {
+public class ScoreEntry {
     private final String username;
     private final int score;
 
-    public LeaderboardInputData(String username, int score) {
+    public ScoreEntry(String username, int score) {
         this.username = username;
         this.score = score;
     }

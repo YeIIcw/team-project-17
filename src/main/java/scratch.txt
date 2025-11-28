@@ -1,5 +1,5 @@
 username, password, points
-test, test, 0
+test, test, 1200
 abc, abc, 0
 cc, cc, 0
 polat, 31, 0

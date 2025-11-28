@@ -1,13 +1,15 @@
+package use_case;
+
 import entity.Character;
 import entity.Combatant;
 import entity.Enemy;
+import org.junit.jupiter.api.Test;
 import use_case.combat.CombatInputData;
 import use_case.combat.CombatInteractor;
 import use_case.combat.CombatOutputBoundary;
 import use_case.combat.CombatOutputData;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CombatInteractorTest {
 

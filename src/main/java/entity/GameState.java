@@ -17,6 +17,7 @@ public class GameState {
 
     private int xp = 0;
     private int enemyIndex = 1;
+    private String currentUsername = "Guest";
 
     private Character player;
     private Enemy currentEnemy;
@@ -123,6 +124,14 @@ public class GameState {
 
     public int getEnemiesDefeated() {
         return enemiesDefeated;
+    }
+
+    public void setCurrentUsername(String username) {
+        this.currentUsername = username;
+    }
+
+    public String getCurrentUsername() {
+        return currentUsername;
     }
 
 }

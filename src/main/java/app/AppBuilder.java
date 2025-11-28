@@ -3,7 +3,10 @@ package app;
 import data_access.Gateway.triviaapi.ApiQuestionFetcher;
 import data_access.Gateway.triviaapi.QuestionFetcher;
 
+import data_access_object.InMemoryLeaderboardDataAccessObject;
+
 import entity.GameState;
+import entity.ScoreEntry;
 
 import interface_adapter.AccountCreated.AccountCreatedViewModel;
 import interface_adapter.HomeScreen.HomeScreenViewModel;
@@ -25,9 +28,18 @@ import interface_adapter.Combat.CombatController;
 import interface_adapter.Combat.CombatPresenter;
 import interface_adapter.Combat.CombatViewModel;
 
+import interface_adapter.leaderboard.LeaderboardController;
+import interface_adapter.leaderboard.LeaderboardPresenter;
+import interface_adapter.leaderboard.LeaderboardViewModel;
+
 import use_case.gameplay.GameplayInputBoundary;
 import use_case.gameplay.GameplayInteractor;
 import use_case.gameplay.GameplayOutputBoundary;
+
+import use_case.leaderboard.LeaderboardDataAccessInterface;
+import use_case.leaderboard.LeaderboardInputBoundary;
+import use_case.leaderboard.LeaderboardInteractor;
+import use_case.leaderboard.LeaderboardOutputBoundary;
 
 import use_case.preferences.PreferencesInputBoundary;
 import use_case.preferences.PreferencesInteractor;
@@ -71,6 +83,9 @@ public class AppBuilder {
     private CombatInteractor combatInteractor;
     private CombatPresenter combatPresenter;
 
+    private LeaderboardController leaderboardController;
+    private LeaderboardView leaderboardView;
+
     private GameState gameState;
     private LoggedInController loggedInController;
 
@@ -113,7 +128,30 @@ public class AppBuilder {
             int enemiesDefeated = gameState.getEnemyIndex();
             int finalScore = gameState.getScore();
 
+            if (leaderboardController != null) {
+                String usernameToUse = gameState.getCurrentUsername();
+                System.out.println("DEBUG: Using username from GameState: " + usernameToUse);
+
+                leaderboardController.execute(usernameToUse, finalScore);
+                System.out.println("DEBUG: Score saved for " + usernameToUse + ": " + finalScore);
+                leaderboardController.showLeaderboard();
+            } else {
+                System.out.println("DEBUG: LeaderboardController is null");
+            }
+
+//                String testUsername = "TestPlayer";
+//                leaderboardController.execute(testUsername, finalScore);
+//                System.out.println("DEBUG: Score saved for " + testUsername + ": " + finalScore);
+//
+//                System.out.println("DEBUG: Showing leaderboard");
+//                leaderboardController.showLeaderboard();
+//
+//            } else {
+//                System.out.println("DEBUG: LeaderboardController is null");
+//            }
+
             GameOverView gov = new GameOverView(this, gameState.getScore(), gameState.getEnemiesDefeated());
+            gov.setLeaderboardView(leaderboardView);
             gov.display();
         });
 
@@ -141,7 +179,7 @@ public class AppBuilder {
 
     public AppBuilder addLoginView() {
         loginViewModel = new LoginViewModel();
-        loginView = new LoginView(loginViewModel);
+        loginView = new LoginView(loginViewModel, gameState);
         return this;
     }
 
@@ -245,7 +283,7 @@ public class AppBuilder {
         loggedInView = new LoggedInView(loggedInViewModel, loggedInController);
 
         if (homeScreenView != null && loginView != null && signupView != null) {
-            var homeCtrl = new interface_adapter.HomeScreen.HomeScreenController(loginView, signupView);
+            var homeCtrl = new interface_adapter.HomeScreen.HomeScreenController(loginView, signupView, gameState);
             homeScreenView.setHomeScreenController(homeCtrl);
         }
 
@@ -264,6 +302,24 @@ public class AppBuilder {
         GameplayController controller = new GameplayController(interactor);
 
         gameplayView = new GameplayView(gameplayViewModel, controller);
+        return this;
+    }
+
+    public AppBuilder addLeaderboardUseCase() {
+        System.out.println("DEBUG: AppBuilder - leaderboard system");
+
+        LeaderboardDataAccessInterface dataAccess = new InMemoryLeaderboardDataAccessObject();
+        LeaderboardViewModel viewModel = new LeaderboardViewModel();
+        LeaderboardOutputBoundary presenter = new LeaderboardPresenter(viewModel);
+        LeaderboardInputBoundary interactor = new LeaderboardInteractor(dataAccess, presenter);
+        LeaderboardController controller = new LeaderboardController(interactor);
+
+        LeaderboardView leaderboardView = new LeaderboardView(viewModel);
+        leaderboardView.setLeaderboardController(controller);
+
+        this.leaderboardController = controller;
+        this.leaderboardView = leaderboardView;
+
         return this;
     }
 

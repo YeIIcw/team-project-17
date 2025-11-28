@@ -1,5 +1,6 @@
 package interface_adapter.HomeScreen;
 
+import entity.GameState;
 import interface_adapter.Login.LoginViewModel;
 import interface_adapter.Signup.SignUpViewModel;
 import view.HomeScreenView;
@@ -10,14 +11,16 @@ public class HomeScreenController {
 
     private LoginView loginView;
     private SignupView signupView;
+    private GameState gameState;
 
     public HomeScreenController() {
         // Default constructor
     }
 
-    public HomeScreenController(LoginView loginView, SignupView signupView) {
+    public HomeScreenController(LoginView loginView, SignupView signupView, GameState gameState) {
         this.loginView = loginView;
         this.signupView = signupView;
+        this.gameState = gameState;
     }
 
     public void setLoginView(LoginView loginView) {
@@ -28,13 +31,17 @@ public class HomeScreenController {
         this.signupView = signupView;
     }
 
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
+    }
+
     public void goToLogin() {
         if (loginView != null) {
             System.out.println("DEBUG: HomeScreenController - Using LoginView from AppBuilder");
             loginView.display();
         } else {
             System.out.println("WARNING: HomeScreenController - loginView is null, creating new one");
-            LoginView newLoginView = new LoginView(new LoginViewModel());
+            LoginView newLoginView = new LoginView(new LoginViewModel(), gameState);
             newLoginView.display();
         }
     }

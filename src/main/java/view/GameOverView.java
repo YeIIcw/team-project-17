@@ -18,6 +18,7 @@ public class GameOverView {
     private final JLabel enemiesLabel;
     private final JButton restartButton;
     private final JButton leaderboardButton;
+    private LeaderboardView leaderboardView;
 
     private final AppBuilder appBuilder;
     private final int score;
@@ -52,6 +53,9 @@ public class GameOverView {
         });
 
         leaderboardButton.addActionListener(e -> {
+            if (leaderboardView != null) {
+                leaderboardView.display();  // 🟢 USE INJECTED VIEW
+            }
         });
 
         JPanel centerPanel = new JPanel(new GridLayout(3, 1));
@@ -66,6 +70,10 @@ public class GameOverView {
         frame.setLayout(new BorderLayout());
         frame.add(centerPanel, BorderLayout.CENTER);
         frame.add(bottomPanel, BorderLayout.SOUTH);
+    }
+
+    public void setLeaderboardView(LeaderboardView leaderboardView) {
+        this.leaderboardView = leaderboardView;
     }
 
     public void display() {
