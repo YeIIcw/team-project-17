@@ -6,10 +6,10 @@ import view.HomeScreenView;
 
 public class AccountCreatedController {
 
-    public void execute() {
-        AccountCreatedView accountCreatedView = new AccountCreatedView(new AccountCreatedViewModel());
+  public void execute() {
+    AccountCreatedView accountCreatedView = new AccountCreatedView(new AccountCreatedViewModel());
 
-        HomeScreenView homeScreenView = new HomeScreenView(new HomeScreenViewModel());
-        homeScreenView.display();
-    }
+    HomeScreenView homeScreenView = new HomeScreenView(new HomeScreenViewModel());
+    homeScreenView.display();
+  }
 }

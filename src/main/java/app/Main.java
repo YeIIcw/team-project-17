@@ -4,43 +4,35 @@ import javax.swing.SwingUtilities;
 
 public class Main {
 
-    // Global reference so GameOverView can restart the game
-    public static AppBuilder builder;
+  // Global reference so GameOverView can restart the game
+  public static AppBuilder builder;
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
+  public static void main(String[] args) {
+    SwingUtilities.invokeLater(() -> {
 
-            Main.builder = new AppBuilder();
+      Main.builder = new AppBuilder();
 
-            Main.builder
-                    .addGameState()
+      Main.builder.addGameState()
 
-                    .addHomeScreenView()
-                    .addHomeScreenUseCase()
+          .addHomeScreenView().addHomeScreenUseCase()
 
-                    .addSignupView()
-                    .addSignupUseCase()
+          .addSignupView().addSignupUseCase()
 
-                    .addLoginView()
-                    .addLoginUseCase()
+          .addLoginView().addLoginUseCase()
 
-                    .addAccountCreatedView()
-                    .addAccountCreatedUseCase()
+          .addAccountCreatedView().addAccountCreatedUseCase()
 
-                    .addPreferencesView()
-                    .addPreferencesUseCase()
+          .addPreferencesView().addPreferencesUseCase()
 
-                    .addLoggedInUseCase()
-                    .addLoggedInView()
+          .addLoggedInUseCase().addLoggedInView()
 
-                    .addGameplayView()
-                    .addGameplayUseCase()
+          .addGameplayView().addGameplayUseCase()
 
-                    .addLeaderboardUseCase()
+          .addLeaderboardUseCase()
 
-                    .addCombatUseCase()
+          .addCombatUseCase()
 
-                    .build();
-        });
-    }
+          .build();
+    });
+  }
 }
