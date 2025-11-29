@@ -54,7 +54,7 @@ public class GameOverView {
 
         leaderboardButton.addActionListener(e -> {
             if (leaderboardView != null) {
-                leaderboardView.display();  // 🟢 USE INJECTED VIEW
+                leaderboardView.display();
             }
         });
 
