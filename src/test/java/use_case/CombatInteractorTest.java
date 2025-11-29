@@ -1,15 +1,15 @@
 package use_case;
 
-import entity.Character;
-import entity.Combatant;
 import entity.Enemy;
+import entity.GameState;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import use_case.combat.CombatInputData;
 import use_case.combat.CombatInteractor;
 import use_case.combat.CombatOutputBoundary;
 import use_case.combat.CombatOutputData;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class CombatInteractorTest {
 
@@ -22,14 +22,21 @@ class CombatInteractorTest {
         }
     }
 
+    private GameState gameState;
+    private FakePresenter presenter;
+    private CombatInteractor interactor;
+
+    @BeforeEach
+    void setUp() {
+        gameState = new GameState();
+        // Create a weaker enemy for testing (25 HP instead of default 50)
+        gameState.getCurrentEnemy().setHealth(25); // Set enemy HP to 25 for testing
+        presenter = new FakePresenter();
+        interactor = new CombatInteractor(presenter, gameState);
+    }
+
     @Test
     void fullCombatFlow_PlayerWins() {
-        Combatant player = new Character(100, 10, 5);
-        Combatant enemy = new Enemy(25, 5);
-
-        FakePresenter presenter = new FakePresenter();
-        CombatInteractor interactor = new CombatInteractor(presenter, player, enemy);
-
         interactor.startBattle();
         CombatOutputData out = presenter.lastOutput;
 
@@ -43,6 +50,7 @@ class CombatInteractorTest {
 
         interactor.executePlayerAction(new CombatInputData(null, null, true));
         out = presenter.lastOutput;
+        // Enemy started with 25 HP, took 10 damage, should have 15 HP
         assertEquals(15, out.getOpponentHealth());
         assertEquals("DEFENSE_CHOICE", out.getNextPhase());
 

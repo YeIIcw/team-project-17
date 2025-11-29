@@ -30,6 +30,11 @@ class LeaderboardInteractorTest {
             public void prepareFailView(LeaderboardOutputData outputData) {
                 fail("Use case failure is unexpected.");
             }
+
+            @Override
+            public void prepareLeaderboardView(java.util.List<ScoreEntry> highScores) {
+                // Not used in this test
+            }
         };
 
         LeaderboardInputBoundary interactor = new LeaderboardInteractor(dataAccess, successPresenter);
@@ -67,6 +72,11 @@ class LeaderboardInteractorTest {
             @Override
             public void prepareFailView(LeaderboardOutputData outputData) {
                 fail("Use case failure is unexpected.");
+            }
+
+            @Override
+            public void prepareLeaderboardView(java.util.List<ScoreEntry> highScores) {
+                // Not used in this test
             }
         };
 
