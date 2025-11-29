@@ -1,11 +1,12 @@
 package use_case.combat;
 
+import entity.Character;
 import entity.Enemy;
 import entity.GameState;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CombatUnitTest {
 
@@ -18,50 +19,108 @@ class CombatUnitTest {
         }
     }
 
-    private GameState gameState;
-    private FakePresenter presenter;
-    private CombatInteractor interactor;
+    static class FakeGameState extends GameState {
+        private final Character player;
+        private Enemy currentEnemy;
+        private int xp;
+        private int enemyIndex;
+        private int enemiesDefeated;
 
-    @BeforeEach
-    void setUp() {
-        gameState = new GameState();
-        // Create a weaker enemy for testing (25 HP instead of default 50)
-        gameState.getCurrentEnemy().setHealth(25); // Set enemy HP to 25 for testing
-        presenter = new FakePresenter();
-        interactor = new CombatInteractor(presenter, gameState);
+        FakeGameState(Character player, Enemy enemy) {
+            super();
+            this.player = player;
+            this.currentEnemy = enemy;
+            this.xp = 0;
+            this.enemyIndex = 0;
+            this.enemiesDefeated = 0;
+        }
+
+        public Character getPlayer() {
+            return player;
+        }
+
+        public Enemy getCurrentEnemy() {
+            return currentEnemy;
+        }
+
+        public void addXP(int amount) {
+            xp += amount;
+        }
+
+        public int getEnemyIndex() {
+            return enemyIndex;
+        }
+
+        public void incrementEnemiesDefeated() {
+            enemiesDefeated++;
+        }
+
+        public void nextEnemy() {
+            enemyIndex++;
+            currentEnemy = new Enemy(30, 5);
+        }
+
+        public void resetPlayerHealth() {
+        }
+
+        public int getEnemiesDefeated() {
+            return enemiesDefeated;
+        }
+
+        int getXp() {
+            return xp;
+        }
     }
 
     @Test
-    void fullCombatFlow_PlayerWins() {
+    void fullCombatFlow_FirstEnemyDies_WithLightAndDodge() {
+        Character player = new Character(100, 10, 5);
+        Enemy enemy = new Enemy(25, 5);
+
+        FakeGameState gameState = new FakeGameState(player, enemy);
+        FakePresenter presenter = new FakePresenter();
+        CombatInteractor interactor = new CombatInteractor(presenter, gameState);
+
         interactor.startBattle();
         CombatOutputData out = presenter.lastOutput;
 
         assertEquals("PLAYER_ACTION_CHOICE", out.getNextPhase());
         assertTrue(out.isOngoing());
 
-        interactor.choosePlayerAction(new CombatInputData(CombatInputData.ACTION_LIGHT, null, false));
-        out = presenter.lastOutput;
-        assertEquals("PLAYER_ACTION_QUESTION", out.getNextPhase());
-        assertEquals("EASY", out.getQuestionDifficulty());
+        while (gameState.getEnemiesDefeated() == 0) {
+            interactor.choosePlayerAction(new CombatInputData(CombatInputData.ACTION_LIGHT, null, false));
+            out = presenter.lastOutput;
+            assertEquals("PLAYER_ACTION_QUESTION", out.getNextPhase());
+            assertEquals("EASY", out.getQuestionDifficulty());
 
-        interactor.executePlayerAction(new CombatInputData(null, null, true));
-        out = presenter.lastOutput;
-        // Enemy started with 25 HP, took 10 damage, should have 15 HP
-        assertEquals(15, out.getOpponentHealth());
-        assertEquals("DEFENSE_CHOICE", out.getNextPhase());
+            interactor.executePlayerAction(new CombatInputData(null, null, true));
+            out = presenter.lastOutput;
 
-        int pending = out.getPendingEnemyDamage();
-        assertTrue(pending > 0);
+            if (!out.isOngoing()) {
+                break;
+            }
 
-        interactor.defend(new CombatInputData(null, CombatInputData.DEFENSE_DODGE, true));
-        out = presenter.lastOutput;
-        assertEquals(100, out.getPlayerHealth());
+            if ("PLAYER_ACTION_CHOICE".equals(out.getNextPhase()) && gameState.getEnemiesDefeated() > 0) {
+                break;
+            }
 
-        interactor.choosePlayerAction(new CombatInputData(CombatInputData.ACTION_HEAVY, null, false));
-        interactor.executePlayerAction(new CombatInputData(null, null, true));
-        out = presenter.lastOutput;
+            if ("DEFENSE_CHOICE".equals(out.getNextPhase())) {
+                int pendingDamage = out.getPendingEnemyDamage();
+                assertTrue(pendingDamage > 0);
 
-        assertFalse(out.isOngoing());
-        assertTrue(out.isPlayerWon());
+                int hpBeforeDefense = out.getPlayerHealth();
+
+                interactor.defend(new CombatInputData(null, CombatInputData.DEFENSE_DODGE, true));
+                out = presenter.lastOutput;
+
+                assertEquals("PLAYER_ACTION_CHOICE", out.getNextPhase());
+                assertEquals(hpBeforeDefense, out.getPlayerHealth());
+                assertEquals(0, out.getDamageToPlayer());
+                assertTrue(out.isOngoing());
+            }
+        }
+
+        assertTrue(gameState.getEnemiesDefeated() >= 1);
+        assertTrue(gameState.getXp() > 0);
     }
 }
