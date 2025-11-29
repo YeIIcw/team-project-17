@@ -8,12 +8,14 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
+import javax.swing.Timer;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class CombatView extends JPanel {
 
@@ -39,6 +41,14 @@ public class CombatView extends JPanel {
 
     private JButton dodgeButton;
     private JButton counterButton;
+
+    private Timer messageTimer;
+
+    private String lastActionType;
+    private String lastDefenseType;
+
+    private boolean awaitingActionResult;
+    private boolean awaitingDefenseResult;
 
     public CombatView(CombatController controller, CombatViewModel viewModel) {
         this.controller = controller;
@@ -97,6 +107,13 @@ public class CombatView extends JPanel {
 
         dodgeButton = new JButton("Dodge");
         counterButton = new JButton("Counter");
+
+        messageTimer = null;
+        lastActionType = null;
+        lastDefenseType = null;
+
+        awaitingActionResult = false;
+        awaitingDefenseResult = false;
     }
 
     private void layoutComponents() {
@@ -135,13 +152,24 @@ public class CombatView extends JPanel {
     }
 
     private void wireActionButtons() {
-        // Attacks: same as before
-        lightAttackButton.addActionListener(e -> controller.chooseLightAttack());
-        heavyAttackButton.addActionListener(e -> controller.chooseHeavyAttack());
-        healButton.addActionListener(e -> controller.chooseHeal());
+        lightAttackButton.addActionListener(e -> {
+            lastActionType = "LIGHT";
+            controller.chooseLightAttack();
+        });
 
-        // DEFENSE: mark pending defense + open trivia question
+        heavyAttackButton.addActionListener(e -> {
+            lastActionType = "HEAVY";
+            controller.chooseHeavyAttack();
+        });
+
+        healButton.addActionListener(e -> {
+            lastActionType = "HEAL";
+            controller.chooseHeal();
+        });
+
         dodgeButton.addActionListener(e -> {
+            lastDefenseType = "DODGE";
+            awaitingDefenseResult = true;
             controller.markPendingDodge();
             if (onQuestionRequested != null) {
                 onQuestionRequested.run();
@@ -149,6 +177,8 @@ public class CombatView extends JPanel {
         });
 
         counterButton.addActionListener(e -> {
+            lastDefenseType = "COUNTER";
+            awaitingDefenseResult = true;
             controller.markPendingCounter();
             if (onQuestionRequested != null) {
                 onQuestionRequested.run();
@@ -156,7 +186,6 @@ public class CombatView extends JPanel {
         });
     }
 
-    // still available if something else wants to override listeners
     public void setDodgeActionListener(ActionListener listener) {
         for (ActionListener l : dodgeButton.getActionListeners()) {
             dodgeButton.removeActionListener(l);
@@ -172,9 +201,15 @@ public class CombatView extends JPanel {
     }
 
     public void refreshFromViewModel() {
+        if (messageTimer != null) {
+            messageTimer.stop();
+            messageTimer = null;
+        }
+
+        String phase = viewModel.getNextPhase();
+
         int playerHp = viewModel.getPlayerHealth();
         int opponentHp = viewModel.getOpponentHealth();
-        String phase = viewModel.getNextPhase();
 
         if ("GAME_OVER".equals(phase)) {
             setVisibleFalse();
@@ -190,8 +225,6 @@ public class CombatView extends JPanel {
         playerDamageLabel.setText("Damage: " + Math.max(0, dmgToEnemyRaw) + " dealt last turn");
         playerHealLabel.setText("Heal: " + heal + " last turn");
 
-        phaseLabel.setText("Phase: " + phase);
-
         String diff = viewModel.getQuestionDifficulty();
         if (diff != null) {
             difficultyLabel.setText("Question difficulty: " + diff);
@@ -200,6 +233,7 @@ public class CombatView extends JPanel {
         }
 
         String message = "";
+        String delayedMessage = null;
 
         if (!viewModel.isOngoing()) {
             if (viewModel.isPlayerWon()) {
@@ -209,30 +243,45 @@ public class CombatView extends JPanel {
             }
         } else {
             if ("PLAYER_ACTION_QUESTION".equals(phase)) {
+                awaitingActionResult = true;
                 message = "Answer the question to perform your action.";
                 if (onQuestionRequested != null) {
                     onQuestionRequested.run();
                 }
             } else if ("DEFENSE_CHOICE".equals(phase)) {
-                message = "Enemy is attacking for "
-                        + viewModel.getPendingEnemyDamage()
-                        + " damage. Choose a defense.";
-            } else if ("DEFENSE_QUESTION".equals(phase)) {
-                message = "Answer the question to resolve your defense.";
-            } else if (dmgToEnemyRaw == -1) {
-                message = "Heavy attack missed!";
-            } else if (dmgToEnemyRaw == -2) {
-                message = "Counter failed! You took " + dmgToPlayer + " damage.";
-            } else if (dmgToEnemyRaw > 0) {
-                message = "Dealt " + dmgToEnemyRaw + " damage.";
-            } else if (heal > 0) {
-                message = "Healed " + heal + " HP.";
-            } else if (dmgToPlayer > 0) {
-                message = "You took " + dmgToPlayer + " damage.";
+                if (awaitingActionResult) {
+                    message = buildActionResultMessage(dmgToEnemyRaw, heal, dmgToPlayer);
+                    delayedMessage = "Enemy is attacking for " + viewModel.getPendingEnemyDamage() + " damage. Choose your defense.";
+                    awaitingActionResult = false;
+                } else {
+                    message = "Enemy is attacking for " + viewModel.getPendingEnemyDamage() + " damage. Choose your defense.";
+                }
+            } else if ("PLAYER_ACTION_CHOICE".equals(phase)) {
+                if (awaitingDefenseResult) {
+                    message = buildDefenseResultMessage(dmgToEnemyRaw, heal, dmgToPlayer);
+                    if (viewModel.isOngoing()) {
+                        delayedMessage = "Choose your action.";
+                    }
+                    awaitingDefenseResult = false;
+                } else {
+                    message = "Choose your action.";
+                }
             }
         }
 
         statusLabel.setText(message);
+
+        if (delayedMessage != null && viewModel.isOngoing()) {
+            final String msg = delayedMessage;
+            messageTimer = new Timer(3000, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    statusLabel.setText(msg);
+                }
+            });
+            messageTimer.setRepeats(false);
+            messageTimer.start();
+        }
 
         boolean enableActions = "PLAYER_ACTION_CHOICE".equals(phase) && viewModel.isOngoing();
         lightAttackButton.setEnabled(enableActions);
@@ -242,6 +291,58 @@ public class CombatView extends JPanel {
         boolean enableDefense = "DEFENSE_CHOICE".equals(phase) && viewModel.isOngoing();
         dodgeButton.setEnabled(enableDefense);
         counterButton.setEnabled(enableDefense);
+    }
+
+    private String buildActionResultMessage(int dmgToEnemyRaw, int heal, int dmgToPlayer) {
+        if ("HEAL".equals(lastActionType)) {
+            return "Correct answer, healed by " + heal;
+        }
+        if ("HEAVY".equals(lastActionType)) {
+            if (dmgToEnemyRaw == -1) {
+                return "Correct answer but missed heavy attack";
+            }
+            if (dmgToEnemyRaw > 0) {
+                return "Correct answer, dealt " + dmgToEnemyRaw + " damage with heavy attack";
+            }
+            return "Wrong answer, action failed";
+        }
+        if ("LIGHT".equals(lastActionType)) {
+            if (dmgToEnemyRaw > 0) {
+                return "Correct answer, dealt " + dmgToEnemyRaw + " damage with light attack";
+            }
+            return "Wrong answer, action failed";
+        }
+        if (dmgToEnemyRaw > 0 || heal > 0) {
+            return "Correct answer, action succeeded";
+        }
+        return "Wrong answer, action failed";
+    }
+
+    private String buildDefenseResultMessage(int dmgToEnemyRaw, int heal, int dmgToPlayer) {
+        if ("COUNTER".equals(lastDefenseType)) {
+            if (dmgToEnemyRaw > 0 && dmgToPlayer == 0) {
+                return "Correct answer, dealt " + dmgToEnemyRaw + " damage with counter";
+            }
+            if (dmgToEnemyRaw == -2 && dmgToPlayer > 0) {
+                return "Correct answer but failed counter, took " + dmgToPlayer + " damage";
+            }
+            if (dmgToPlayer > 0 && dmgToEnemyRaw == 0) {
+                return "Wrong answer, defense failed, took " + dmgToPlayer + " damage";
+            }
+        } else if ("DODGE".equals(lastDefenseType)) {
+            if (dmgToPlayer == 0) {
+                return "Correct answer, defense succeeded";
+            } else {
+                return "Wrong answer, defense failed, took " + dmgToPlayer + " damage";
+            }
+        }
+        if (dmgToPlayer > 0) {
+            return "Wrong answer, defense failed, took " + dmgToPlayer + " damage";
+        }
+        if (dmgToEnemyRaw > 0) {
+            return "Correct answer, defense succeeded";
+        }
+        return "";
     }
 
     public void setOnQuestionRequested(Runnable r) {
