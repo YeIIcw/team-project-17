@@ -268,7 +268,6 @@ class PreferencesInteractorTest5 {
 
     @Test
     void testExecute_VerifyAllOutputDataFields() {
-        // Arrange
         PreferencesInputData inputData = new PreferencesInputData(
                 "History",
                 "Medium",
@@ -278,15 +277,12 @@ class PreferencesInteractorTest5 {
 
         fakeQuestionFetcher.setShouldSucceed(true);
 
-        // Act
         interactor.execute(inputData);
 
-        // Assert - Call ALL getters to achieve 100% coverage
         PreferencesOutputData outputData = testPresenter.lastOutputData;
 
         assertNotNull(outputData, "OutputData should not be null");
 
-        // Test all getters
         assertEquals("History", outputData.getCategory());
         assertEquals("Medium", outputData.getDifficulty());
         assertEquals("True/False", outputData.getType());
@@ -297,7 +293,6 @@ class PreferencesInteractorTest5 {
 
     @Test
     void testExecute_VerifyErrorOutputDataFields() {
-        // Arrange
         PreferencesInputData inputData = new PreferencesInputData(
                 "Science & Nature",
                 "Hard",
@@ -307,15 +302,12 @@ class PreferencesInteractorTest5 {
 
         fakeQuestionFetcher.setShouldThrowNotFoundException(true);
 
-        // Act
         interactor.execute(inputData);
 
-        // Assert - Call ALL getters for error case too
         PreferencesOutputData outputData = testPresenter.lastOutputData;
 
         assertNotNull(outputData, "OutputData should not be null");
 
-        // Test all getters
         assertEquals("Science & Nature", outputData.getCategory());
         assertEquals("Hard", outputData.getDifficulty());
         assertEquals("Multiple Choice", outputData.getType());
