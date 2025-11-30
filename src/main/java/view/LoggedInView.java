@@ -1,5 +1,6 @@
 package view;
 
+import app.AppBuilder;
 import interface_adapter.Loggedin.LoggedInController;
 import interface_adapter.Loggedin.LoggedInViewModel;
 import interface_adapter.logout.LogoutController;
@@ -10,6 +11,8 @@ public class LoggedInView {
 
     private LoggedInViewModel loggedInViewModel;
     private LoggedInController loggedInController;
+    private AppBuilder appBuilder;
+    private LeaderboardView leaderboardView;
 
     private final JFrame frame = new JFrame();
 
@@ -18,7 +21,8 @@ public class LoggedInView {
     private final JButton statsButton = new JButton("Stats");
     private final JButton logoutButton = new JButton("Logout");
 
-    public LoggedInView(LoggedInViewModel loggedInViewModel, LoggedInController loggedInController) {
+    public LoggedInView(AppBuilder appbuilder, LoggedInViewModel loggedInViewModel, LoggedInController loggedInController) {
+        this.appBuilder = appbuilder;
         this.loggedInViewModel = loggedInViewModel;
         this.loggedInController = loggedInController;
 
@@ -46,7 +50,8 @@ public class LoggedInView {
         statsButton.addActionListener(e -> {
 
             if (e.getSource().equals(statsButton)) {
-                loggedInController.goToStats();
+                appbuilder.addLeaderboardUseCase();
+                leaderboardView.display();
                 frame.dispose();
             }
         });

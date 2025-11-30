@@ -1,5 +1,6 @@
 package interface_adapter.Login;
 
+import app.AppBuilder;
 import entity.GameState;
 import entity.Player;
 import interface_adapter.HomeScreen.HomeScreenViewModel;
@@ -24,14 +25,20 @@ public class LoginController {
     private LoggedInController loggedInController;
     private PreferencesController preferencesController;
     private GameState gameState;
+    private AppBuilder appBuilder;
 
     public LoginController() {
         // Default constructor for backward compatibility
     }
 
-    public LoginController(LoggedInController loggedInController, PreferencesController preferencesController) {
+    public LoginController(AppBuilder appbuilder, LoggedInController loggedInController, PreferencesController preferencesController) {
+        this.appBuilder = appbuilder;
         this.loggedInController = loggedInController;
         this.preferencesController = preferencesController;
+    }
+
+    public void setAppBuilder(AppBuilder appBuilder) {
+        this.appBuilder = appBuilder;
     }
 
     public void setGameState(GameState gameState) {
@@ -46,7 +53,7 @@ public class LoginController {
         this.preferencesController = preferencesController;
     }
 
-    public void execute(String username, String password) throws IOException {
+    public void execute(String username, String password, AppBuilder appbuilder) throws IOException {
         System.out.println("DEBUG: LoginController - execute() called");
 
         if (gameState != null) {
@@ -58,6 +65,7 @@ public class LoginController {
 
         this.username = username;
         this.password = password;
+        this.appBuilder = appbuilder;
 
         LoginInteractor loginInteractor = new LoginInteractor();
         loginInteractor.execute(username, password);
@@ -85,7 +93,7 @@ public class LoginController {
             System.out.println("DEBUG: LoginController - Using provided LoggedInController (has correct PreferencesView)");
         }
 
-        LoggedInView loggedInView = new LoggedInView(new LoggedInViewModel(), loggedInController);
+        LoggedInView loggedInView = new LoggedInView(appbuilder, new LoggedInViewModel(), loggedInController);
         System.out.println("DEBUG: LoginController - Displaying LoggedInView");
         loggedInView.display();
     }

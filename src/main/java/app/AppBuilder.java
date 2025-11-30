@@ -178,8 +178,9 @@ public class AppBuilder {
     }
 
     public AppBuilder addLoginView() {
+
         loginViewModel = new LoginViewModel();
-        loginView = new LoginView(loginViewModel, gameState);
+        loginView = new LoginView(loginViewModel, gameState, this);
         return this;
     }
 
@@ -280,7 +281,7 @@ public class AppBuilder {
     }
 
     public AppBuilder addLoggedInView() {
-        loggedInView = new LoggedInView(loggedInViewModel, loggedInController);
+        loggedInView = new LoggedInView(this, loggedInViewModel, loggedInController);
 
         if (homeScreenView != null && loginView != null && signupView != null) {
             var homeCtrl = new interface_adapter.HomeScreen.HomeScreenController(loginView, signupView, gameState);
