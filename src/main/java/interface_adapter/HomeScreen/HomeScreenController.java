@@ -1,5 +1,6 @@
 package interface_adapter.HomeScreen;
 
+import app.AppBuilder;
 import entity.GameState;
 import interface_adapter.Login.LoginViewModel;
 import interface_adapter.Signup.SignUpViewModel;
@@ -41,7 +42,7 @@ public class HomeScreenController {
             loginView.display();
         } else {
             System.out.println("WARNING: HomeScreenController - loginView is null, creating new one");
-            LoginView newLoginView = new LoginView(new LoginViewModel(), gameState);
+            LoginView newLoginView = new LoginView(new LoginViewModel(), gameState, new AppBuilder());
             newLoginView.display();
         }
     }

@@ -1,5 +1,6 @@
 package view;
 
+import app.AppBuilder;
 import entity.GameState;
 import interface_adapter.Login.LoginController;
 import interface_adapter.Login.LoginViewModel;
@@ -20,6 +21,7 @@ public class LoginView {
     private interface_adapter.Preferences.PreferencesController preferencesController;
     private interface_adapter.Loggedin.LoggedInController loggedInController;
     private GameState gameState;
+    private AppBuilder appBuilder;
 
     private final JFrame frame = new JFrame();
     private final JLabel usernameLabel = new JLabel("Username:");
@@ -29,7 +31,8 @@ public class LoginView {
     private final JButton loginButton = new JButton("Login");
     private final JButton backButton = new JButton("Back");
 
-    public LoginView(LoginViewModel loginViewModel, GameState gameState) {
+    public LoginView(LoginViewModel loginViewModel, GameState gameState, AppBuilder appBuilder) {
+        this.appBuilder = appBuilder;
         this.loginViewModel = loginViewModel;
         this.gameState = gameState;
 
@@ -63,6 +66,7 @@ public class LoginView {
                         (preferencesController != null ? "not null" : "null"));
                     
                     LoginController loginController = new LoginController();
+                    loginController.setAppBuilder(appBuilder);
 
                     if (gameState != null) {
                         loginController.setGameState(gameState);
@@ -102,7 +106,7 @@ public class LoginView {
                             newFrame.setVisible(true);
                         }
                         else {
-                            loginController.execute(usernameText.getText(), passwordText.getText());
+                            loginController.execute(usernameText.getText(), passwordText.getText(), appBuilder);
                             frame.dispose();
                             newFrame.dispose();
                         }

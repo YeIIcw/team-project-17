@@ -5,3 +5,4 @@ cc, cc, 0
 polat, 31, 0
 ediz, 31, 900
 123, 123, 0
+test1, test1, 0
