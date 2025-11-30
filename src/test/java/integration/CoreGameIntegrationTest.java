@@ -1,5 +1,6 @@
 package integration;
 
+import app.AppBuilder;
 import entity.GameState;
 import entity.Question;
 import use_case.gameplay.GameplayInputData;
@@ -43,6 +44,7 @@ public class CoreGameIntegrationTest {
 
         // game start setup
         GameState gameState = new GameState();
+        AppBuilder appBuilder = new AppBuilder();
         gameState.setCurrentUsername("TestPlayer");
 
         // load questions from preferences into game
@@ -63,7 +65,7 @@ public class CoreGameIntegrationTest {
 
         // start gameplay with questions
         MockGameplayPresenter presenter = new MockGameplayPresenter();
-        GameplayInteractor gameplayInteractor = new GameplayInteractor(gameState, presenter);
+        GameplayInteractor gameplayInteractor = new GameplayInteractor(gameState, presenter, appBuilder);
 
         // answer first combat question (light attack)
         gameplayInteractor.getNextQuestion();
