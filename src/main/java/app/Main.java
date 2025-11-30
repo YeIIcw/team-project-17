@@ -36,8 +36,6 @@ public class Main {
                     .addGameplayView()
                     .addGameplayUseCase()
 
-                    .addLeaderboardUseCase()
-
                     .addCombatUseCase()
 
                     .build();
