@@ -4,5 +4,5 @@ import java.io.IOException;
 
 public interface SignupUserDataAccessInterface {
 
-    public void signup(String username, String password) throws IOException;
+  public void signup(String username, String password) throws IOException;
 }

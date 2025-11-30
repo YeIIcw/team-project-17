@@ -4,5 +4,5 @@ import java.io.IOException;
 
 public interface LoginInputBoundary {
 
-    public void execute(String username, String password) throws IOException;
+  public void execute(String username, String password) throws IOException;
 }

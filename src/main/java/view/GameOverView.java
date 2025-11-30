@@ -12,71 +12,71 @@ import java.awt.GridLayout;
 
 public class GameOverView {
 
-    private final JFrame frame;
-    private final JLabel titleLabel;
-    private final JLabel scoreLabel;
-    private final JLabel enemiesLabel;
-    private final JButton restartButton;
-    private final JButton leaderboardButton;
-    private LeaderboardView leaderboardView;
+  private final JFrame frame;
+  private final JLabel titleLabel;
+  private final JLabel scoreLabel;
+  private final JLabel enemiesLabel;
+  private final JButton restartButton;
+  private final JButton leaderboardButton;
+  private LeaderboardView leaderboardView;
 
-    private final AppBuilder appBuilder;
-    private final int score;
-    private final int enemiesDefeated;
+  private final AppBuilder appBuilder;
+  private final int score;
+  private final int enemiesDefeated;
 
-    public GameOverView(AppBuilder appBuilder, int score, int enemiesDefeated) {
-        this.appBuilder = appBuilder;
-        this.score = score;
-        this.enemiesDefeated = enemiesDefeated;
+  public GameOverView(AppBuilder appBuilder, int score, int enemiesDefeated) {
+    this.appBuilder = appBuilder;
+    this.score = score;
+    this.enemiesDefeated = enemiesDefeated;
 
-        frame = new JFrame("Game Over");
-        frame.setSize(400, 230);
-        frame.setLocationRelativeTo(null);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    frame = new JFrame("Game Over");
+    frame.setSize(400, 230);
+    frame.setLocationRelativeTo(null);
+    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        titleLabel = new JLabel("GAME OVER", JLabel.CENTER);
-        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
+    titleLabel = new JLabel("GAME OVER", JLabel.CENTER);
+    titleLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
 
-        scoreLabel = new JLabel("Score: " + score, JLabel.CENTER);
-        scoreLabel.setFont(new Font("SansSerif", Font.PLAIN, 18));
+    scoreLabel = new JLabel("Score: " + score, JLabel.CENTER);
+    scoreLabel.setFont(new Font("SansSerif", Font.PLAIN, 18));
 
-        enemiesLabel = new JLabel("Enemies defeated: " + enemiesDefeated, JLabel.CENTER);
-        enemiesLabel.setFont(new Font("SansSerif", Font.PLAIN, 18));
+    enemiesLabel = new JLabel("Enemies defeated: " + enemiesDefeated, JLabel.CENTER);
+    enemiesLabel.setFont(new Font("SansSerif", Font.PLAIN, 18));
 
-        restartButton = new JButton("Restart Game");
-        leaderboardButton = new JButton("See Leaderboard");
+    restartButton = new JButton("Restart Game");
+    leaderboardButton = new JButton("See Leaderboard");
 
-        restartButton.addActionListener(e -> {
-            frame.setVisible(false);
-            frame.dispose();
-            appBuilder.resetAndRestart();
-        });
+    restartButton.addActionListener(e -> {
+      frame.setVisible(false);
+      frame.dispose();
+      appBuilder.resetAndRestart();
+    });
 
-        leaderboardButton.addActionListener(e -> {
-            if (leaderboardView != null) {
-                leaderboardView.display();  // 🟢 USE INJECTED VIEW
-            }
-        });
+    leaderboardButton.addActionListener(e -> {
+      if (leaderboardView != null) {
+        leaderboardView.display(); // 🟢 USE INJECTED VIEW
+      }
+    });
 
-        JPanel centerPanel = new JPanel(new GridLayout(3, 1));
-        centerPanel.add(titleLabel);
-        centerPanel.add(scoreLabel);
-        centerPanel.add(enemiesLabel);
+    JPanel centerPanel = new JPanel(new GridLayout(3, 1));
+    centerPanel.add(titleLabel);
+    centerPanel.add(scoreLabel);
+    centerPanel.add(enemiesLabel);
 
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.add(restartButton);
-        bottomPanel.add(leaderboardButton);
+    JPanel bottomPanel = new JPanel();
+    bottomPanel.add(restartButton);
+    bottomPanel.add(leaderboardButton);
 
-        frame.setLayout(new BorderLayout());
-        frame.add(centerPanel, BorderLayout.CENTER);
-        frame.add(bottomPanel, BorderLayout.SOUTH);
-    }
+    frame.setLayout(new BorderLayout());
+    frame.add(centerPanel, BorderLayout.CENTER);
+    frame.add(bottomPanel, BorderLayout.SOUTH);
+  }
 
-    public void setLeaderboardView(LeaderboardView leaderboardView) {
-        this.leaderboardView = leaderboardView;
-    }
+  public void setLeaderboardView(LeaderboardView leaderboardView) {
+    this.leaderboardView = leaderboardView;
+  }
 
-    public void display() {
-        frame.setVisible(true);
-    }
+  public void display() {
+    frame.setVisible(true);
+  }
 }
