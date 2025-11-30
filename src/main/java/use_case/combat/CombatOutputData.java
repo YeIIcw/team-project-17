@@ -16,11 +16,6 @@ public class CombatOutputData {
     private final String defenseType;
     private final int pendingEnemyDamage;
 
-    // NEW FIELDS
-    private final boolean gameOver;
-    private final int finalXP;
-    private final int finalRound;
-
     public CombatOutputData(int playerHealth,
                             int opponentHealth,
                             boolean ongoing,
@@ -72,10 +67,6 @@ public class CombatOutputData {
         this.actionType = actionType;
         this.defenseType = defenseType;
         this.pendingEnemyDamage = pendingEnemyDamage;
-
-        this.gameOver = gameOver;
-        this.finalXP = finalXP;
-        this.finalRound = finalRound;
     }
 
     public int getPlayerHealth() { return playerHealth; }
@@ -91,8 +82,4 @@ public class CombatOutputData {
     public String getActionType() { return actionType; }
     public String getDefenseType() { return defenseType; }
     public int getPendingEnemyDamage() { return pendingEnemyDamage; }
-
-    public boolean isGameOver() { return gameOver; }
-    public int getFinalXP() { return finalXP; }
-    public int getFinalRound() { return finalRound; }
 }

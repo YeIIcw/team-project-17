@@ -1,17 +1,13 @@
-package use_case;
+package use_case.combat;
 
 import entity.Enemy;
 import entity.GameState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import use_case.combat.CombatInputData;
-import use_case.combat.CombatInteractor;
-import use_case.combat.CombatOutputBoundary;
-import use_case.combat.CombatOutputData;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CombatInteractorTest {
+class CombatUnitTest {
 
     static class FakePresenter implements CombatOutputBoundary {
         CombatOutputData lastOutput;

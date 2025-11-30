@@ -42,7 +42,9 @@ public class CombatInteractor implements CombatInputBoundary {
                 true,
                 false,
                 false,
-                0, 0, 0,
+                0,
+                0,
+                0,
                 "PLAYER_ACTION_CHOICE",
                 null,
                 null,
@@ -110,7 +112,7 @@ public class CombatInteractor implements CombatInputBoundary {
                     enemy.takeDamage(heavyDamage);
                     damageToOpponent = before - enemy.getHealth();
                 } else {
-                    damageToOpponent = -1; // heavy attack miss işareti
+                    damageToOpponent = -1;
                 }
 
             } else if (pendingActionType.equals(CombatInputData.ACTION_HEAL)) {
@@ -131,7 +133,7 @@ public class CombatInteractor implements CombatInputBoundary {
         }
 
         int baseDamage = enemy.getDamage();
-        double mult = 1.0 + random.nextDouble(); // 1.0–2.0 arası
+        double mult = 1.0 + random.nextDouble();
         pendingEnemyDamage = (int) Math.round(baseDamage * mult);
 
         CombatOutputData out = new CombatOutputData(
@@ -219,7 +221,6 @@ public class CombatInteractor implements CombatInputBoundary {
         presenter.present(out);
     }
 
-
     private void updateBattleState() {
         if (battle.getOpponent().isDead()) {
             battle.setOngoing(false);
@@ -284,7 +285,6 @@ public class CombatInteractor implements CombatInputBoundary {
                     0
             );
             presenter.present(out);
-            return;
         }
     }
 
