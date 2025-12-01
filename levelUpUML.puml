@@ -1,0 +1,109 @@
+@startuml
+
+' ***************************************************************
+'  CLASS DIAGRAM — NO GRAPHVIZ REQUIRED
+'  Uses UML Salt layout instead of Graphviz
+' ***************************************************************
+!pragma layout smetana
+
+package "Use Case: Combat" {
+    class CombatInteractor {
+        - presenter : CombatOutputBoundary
+        - gameState : GameState
+        - levelUpPresenter : LevelUpOutputBoundary
+        - battle : Battle
+        - pendingActionType : String
+        - pendingEnemyDamage : int
+        - lvledUp : boolean
+        --
+        + startBattle()
+        + choosePlayerAction()
+        + executePlayerAction()
+        + defend()
+    }
+
+    interface CombatInputBoundary {
+        + startBattle()
+        + choosePlayerAction()
+        + executePlayerAction()
+        + defend()
+    }
+
+    interface CombatOutputBoundary {
+        + present(CombatOutputData)
+        + playerReadyToLevel(health:int, damage:int)
+    }
+}
+
+package "Use Case: LevelUp" {
+    class LevelUpInteractor {
+        - player : Character
+        - presenter : LevelUpOutputBoundary
+        --
+        + levelUp(input : LevelUpInputData)
+        + setLevelUpFinishedCallback(Runnable)
+    }
+
+    interface LevelUpInputBoundary {
+        + levelUp(LevelUpInputData)
+    }
+
+    interface LevelUpOutputBoundary {
+        + presentUpdatedStats(LevelUpOutputData)
+        + levelUpComplete()
+    }
+}
+
+package "Interface Adapters" {
+    class LevelUpController {
+        - interactor : LevelUpInputBoundary
+        --
+        + chooseHealth()
+        + chooseDamage()
+    }
+
+    class LevelUpPresenter {
+        - view : LevelUpViewCallback
+        - viewModel : LevelUpViewModel
+        --
+        + presentUpdatedStats(LevelUpOutputData)
+        + levelUpComplete()
+    }
+
+    interface LevelUpViewCallback {
+        + showLevelUpScreen(LevelUpViewModel)
+        + hideLevelUpScreen()
+    }
+
+    class LevelUpViewModel {
+        + getHealth() : int
+        + getDamage() : int
+    }
+}
+
+package "View Layer" {
+    class LevelUpView {
+        - controller : LevelUpController
+        --
+        + showLevelUpScreen(LevelUpViewModel)
+        + hideLevelUpScreen()
+    }
+}
+
+' ***************************************************************
+' RELATIONSHIPS
+' ***************************************************************
+
+CombatInteractor --> CombatOutputBoundary : uses
+CombatInteractor --> LevelUpOutputBoundary : triggers level up
+
+LevelUpController --> LevelUpInputBoundary
+LevelUpPresenter --> LevelUpViewCallback
+LevelUpPresenter --> LevelUpViewModel
+
+LevelUpInteractor --> LevelUpOutputBoundary
+
+LevelUpView --> LevelUpController
+LevelUpViewCallback <|.. LevelUpView
+
+@enduml
