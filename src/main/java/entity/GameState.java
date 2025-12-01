@@ -1,8 +1,6 @@
 package entity;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class GameState {
 
@@ -102,6 +100,10 @@ public class GameState {
     public int getXP() {
         return xp;
     }
+
+    public void setXP(int xp) {this.xp = xp;}
+
+    public int nextXP() { return 20;}
 
     public void resetPlayerHealth() {
         player.setHealth(100);

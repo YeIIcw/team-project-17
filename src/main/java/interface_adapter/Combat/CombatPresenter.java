@@ -1,17 +1,23 @@
 package interface_adapter.Combat;
 
+import interface_adapter.LevelUp.LevelUpViewModel;
 import use_case.combat.CombatOutputBoundary;
 import use_case.combat.CombatOutputData;
+
+import java.awt.*;
 
 public class CombatPresenter implements CombatOutputBoundary {
 
     private final CombatViewModel viewModel;
+    private final LevelUpViewModel levelUpViewModel;
 
     private Runnable uiUpdateCallback;
     private Runnable gameOverCallback;
+    private Runnable levelUpCallback;
 
-    public CombatPresenter(CombatViewModel viewModel) {
+    public CombatPresenter(CombatViewModel viewModel, LevelUpViewModel levelUpViewModel) {
         this.viewModel = viewModel;
+        this.levelUpViewModel = levelUpViewModel;
     }
 
     public void setUiUpdateCallback(Runnable uiUpdateCallback) {
@@ -42,6 +48,13 @@ public class CombatPresenter implements CombatOutputBoundary {
                 gameOverCallback.run();
             }
         } else {
+            if (outputData.getLvledUp()) {
+                viewModel.setNextPhase("LEVEL_UP");
+                if (levelUpCallback != null) {
+                    levelUpCallback.run();
+                }
+                return;
+            }
             viewModel.setNextPhase(outputData.getNextPhase());
         }
 
@@ -49,6 +62,22 @@ public class CombatPresenter implements CombatOutputBoundary {
             uiUpdateCallback.run();
         }
     }
+
+    @Override
+    public void playerReadyToLevel(int health, int damage) {
+        // Update LevelUpViewModel
+        levelUpViewModel.setStats(health, damage);
+
+        // Trigger the callback to show the view
+        if (levelUpCallback != null) {
+            levelUpCallback.run();
+        }
+    }
+
+    public void setLevelUpCallback(Runnable levelUpCallback) {
+        this.levelUpCallback = levelUpCallback;
+    }
+
 
     public CombatViewModel getViewModel() {
         return viewModel;
