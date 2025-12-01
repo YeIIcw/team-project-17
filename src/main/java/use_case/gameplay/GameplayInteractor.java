@@ -1,16 +1,20 @@
 package use_case.gameplay;
 
+import app.AppBuilder;
 import entity.GameState;
 import entity.Question;
+import view.GameOverView;
 
 public class GameplayInteractor implements GameplayInputBoundary {
 
     private final GameState gameState;
     private final GameplayOutputBoundary presenter;
+    private final AppBuilder appBuilder;
 
-    public GameplayInteractor(GameState gameState, GameplayOutputBoundary presenter) {
+    public GameplayInteractor(GameState gameState, GameplayOutputBoundary presenter, AppBuilder appBuilder) {
         this.gameState = gameState;
         this.presenter = presenter;
+        this.appBuilder = appBuilder;
     }
 
     @Override
@@ -48,13 +52,15 @@ public class GameplayInteractor implements GameplayInputBoundary {
         System.out.println("DEBUG: GameplayInteractor - questions list size: " + 
             (gameState.getQuestions() != null ? gameState.getQuestions().size() : "null"));
         System.out.println("DEBUG: GameplayInteractor - currentQuestionIndex: " + gameState.getCurrentQuestionIndex());
-        
+
         if (!gameState.hasMoreQuestions()) {
             System.out.println("DEBUG: GameplayInteractor - No more questions available");
             // No more questions - could show game over screen
+            GameOverView gameOverView = new GameOverView(appBuilder, gameState.getScore(), gameState.getEnemiesDefeated());
+            gameOverView.display();
             return;
         }
-        
+
         Question currentQuestion = gameState.getCurrentQuestion();
         System.out.println("DEBUG: GameplayInteractor - Current question: " + 
             (currentQuestion != null ? currentQuestion.getText() : "null"));

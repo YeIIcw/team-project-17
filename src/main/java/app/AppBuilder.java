@@ -204,8 +204,9 @@ public class AppBuilder {
     }
 
     public AppBuilder addLoginView() {
+
         loginViewModel = new LoginViewModel();
-        loginView = new LoginView(loginViewModel, gameState);
+        loginView = new LoginView(loginViewModel, gameState, this);
         return this;
     }
 
@@ -306,7 +307,7 @@ public class AppBuilder {
     }
 
     public AppBuilder addLoggedInView() {
-        loggedInView = new LoggedInView(loggedInViewModel, loggedInController);
+        loggedInView = new LoggedInView(this, loggedInViewModel, loggedInController);
 
         if (homeScreenView != null && loginView != null && signupView != null) {
             var homeCtrl = new interface_adapter.HomeScreen.HomeScreenController(loginView, signupView, gameState);
@@ -318,12 +319,13 @@ public class AppBuilder {
 
     public AppBuilder addGameplayView() {
         gameplayViewModel = new GameplayViewModel();
+        gameplayViewModel.setHasMoreQuestions(true);
         return this;
     }
 
     public AppBuilder addGameplayUseCase() {
         gameplayPresenter = new GameplayPresenter(gameplayViewModel);
-        gameplayInteractor = new GameplayInteractor(gameState, gameplayPresenter);
+        gameplayInteractor = new GameplayInteractor(gameState, gameplayPresenter, this);
         GameplayInputBoundary interactor = gameplayInteractor;
         GameplayController controller = new GameplayController(interactor);
 
@@ -345,6 +347,7 @@ public class AppBuilder {
 
         this.leaderboardController = controller;
         this.leaderboardView = leaderboardView;
+        leaderboardView.display();
 
         return this;
     }

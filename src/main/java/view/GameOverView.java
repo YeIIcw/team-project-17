@@ -53,8 +53,9 @@ public class GameOverView {
         });
 
         leaderboardButton.addActionListener(e -> {
+            appBuilder.addLeaderboardUseCase();
             if (leaderboardView != null) {
-                leaderboardView.display();  // 🟢 USE INJECTED VIEW
+                leaderboardView.display();
             }
         });
 
