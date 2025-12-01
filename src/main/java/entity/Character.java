@@ -6,7 +6,7 @@ public class Character extends Combatant {
 
     public Character(int health, int damage, int healing) {
         super(health, damage);
-        this.damage = 30;
+        this.damage = 20;
         this.healing = healing;
         this.timesLeveled = 0;
     }
