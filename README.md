@@ -64,14 +64,14 @@ src/main/java/
 
 The following user stories represent the core functionality of the application:
 
-| Use Case | Description | Responsible Team Member | Status |
-|----------|-------------|------------------------|--------|
-| **Use Case 1: Sign up for an Account** | Users can create a new account with username and password | _To be assigned_ | ✅ Implemented |
-| **Use Case 2: Log in** | Existing users can log in with their credentials | _To be assigned_ | ✅ Implemented |
-| **Use Case 3: Select Category and Difficulty** | Users can choose question category and difficulty level before playing | _To be assigned_ | ✅ Implemented |
-| **Use Case 4: Answer Questions** | Players answer trivia questions during gameplay, with scoring based on correctness | _To be assigned_ | ✅ Implemented |
-| **Use Case 5: High Score Board** | Players can view leaderboard with top scores and compare their performance | _To be assigned_ | ✅ Implemented |
-| **Use Case 6: Two Player Mode** | Players can compete against each other in multiplayer mode | _To be assigned_ | 🔲 In Progress |
+| Use Case                                               | Description                                                                       | Responsible Team Member | Status |
+|--------------------------------------------------------|-----------------------------------------------------------------------------------|------------------------|--------|
+| **Use Case 1: Sign up and sign in**                    | Users can create a new account or sign into an existing one                       | _Eliza Azaro_          | ✅ Implemented |
+| **Use Case 2: Select Category and Difficulty**         | Users can choose question category and difficulty level before playing            | _Wei Xia_       | ✅ Implemented |
+| **Use Case 3: Choose combat actions to fight enemies** | Users can choose actions to fight enemies in a turn-based combat                  | _Ediz Cagan Uysal_       | ✅ Implemented |
+| **Use Case 4: Answer Questions**                       | Players answer trivia questions during gameplay, with scoring based on correctness | _Yanzhao Wang_       | ✅ Implemented |
+| **Use Case 5: Use Points**                             | Users can use experience points to enhance their stats                            | _Matei Tarcea_       | ✅ Implemented |
+| **Use Case 6: See Leaderboard**                        | Users can see their score compared to other player's scores in a leaderboard      | _Annie Wang_       | ✅ Implemented |
 
 _Note: Team member assignments should be updated as tasks are distributed. See TeamContract.md for team structure._
 
@@ -179,14 +179,22 @@ The compiled JAR will be in `target/TeamProject-1.0-SNAPSHOT.jar`
 
 _Screenshots demonstrating current functionality will be added here._
 
-#### Suggested Screenshots:
 - Home Screen
+![demo of initial GUI](src/image1.png)
 - Login/Signup Interface
+![demo of initial GUI](src/image2.png)
+![demo of initial GUI](src/image3.png)
+![demo of initial GUI](src/image4.png)
 - Preferences Selection (Category/Difficulty)
+![demo of initial GUI](src/preferences.png)
 - Gameplay View with Questions
+![demo of initial GUI](src/Question.png)
 - Combat Interface
+![demo of initial GUI](src/CombatView.png)
+- Game Over View
+![demo of initial GUI](src/GameOver.png)
 - Leaderboard View
-
+![demo of initial GUI](src/leaderboard.png)
 ---
 
 ## Team Members
