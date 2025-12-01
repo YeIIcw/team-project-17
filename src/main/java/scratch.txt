@@ -5,6 +5,7 @@ cc, cc, 0
 polat, 31, 0
 ediz, 31, 900
 123, 123, 0
+matei, matei001, 300
 test1, test1, 0
 testing_username, testing_password, 0
 testing_username1, testing_password, 0

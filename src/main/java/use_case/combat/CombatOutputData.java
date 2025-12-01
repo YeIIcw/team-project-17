@@ -16,6 +16,13 @@ public class CombatOutputData {
     private final String defenseType;
     private final int pendingEnemyDamage;
 
+    // NEW FIELDS
+    private final boolean gameOver;
+    private final int finalXP;
+    private final int finalRound;
+    private final boolean lvledUp;
+
+
     public CombatOutputData(int playerHealth,
                             int opponentHealth,
                             boolean ongoing,
@@ -28,12 +35,12 @@ public class CombatOutputData {
                             String questionDifficulty,
                             String actionType,
                             String defenseType,
-                            int pendingEnemyDamage) {
+                            int pendingEnemyDamage, boolean lvledUp) {
 
         this(playerHealth, opponentHealth, ongoing, playerWon, playerLost,
                 damageToPlayer, damageToOpponent, healAmount, nextPhase,
                 questionDifficulty, actionType, defenseType,
-                pendingEnemyDamage, false, 0, 0);
+                pendingEnemyDamage, false, 0, 0, lvledUp);
     }
 
     // FULL constructor (used for GAME OVER)
@@ -52,7 +59,7 @@ public class CombatOutputData {
                             int pendingEnemyDamage,
                             boolean gameOver,
                             int finalXP,
-                            int finalRound) {
+                            int finalRound, boolean lvledUp) {
 
         this.playerHealth = playerHealth;
         this.opponentHealth = opponentHealth;
@@ -67,6 +74,11 @@ public class CombatOutputData {
         this.actionType = actionType;
         this.defenseType = defenseType;
         this.pendingEnemyDamage = pendingEnemyDamage;
+
+        this.gameOver = gameOver;
+        this.finalXP = finalXP;
+        this.finalRound = finalRound;
+        this.lvledUp = lvledUp;
     }
 
     public int getPlayerHealth() { return playerHealth; }
@@ -82,4 +94,9 @@ public class CombatOutputData {
     public String getActionType() { return actionType; }
     public String getDefenseType() { return defenseType; }
     public int getPendingEnemyDamage() { return pendingEnemyDamage; }
+
+    public boolean isGameOver() { return gameOver; }
+    public int getFinalXP() { return finalXP; }
+    public int getFinalRound() { return finalRound; }
+    public boolean getLvledUp() { return lvledUp; }
 }

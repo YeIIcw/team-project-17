@@ -10,6 +10,7 @@ import entity.ScoreEntry;
 
 import interface_adapter.AccountCreated.AccountCreatedViewModel;
 import interface_adapter.HomeScreen.HomeScreenViewModel;
+import interface_adapter.LevelUp.LevelUpViewModel;
 import interface_adapter.Loggedin.LoggedInController;
 import interface_adapter.Loggedin.LoggedInViewModel;
 import interface_adapter.Login.LoginViewModel;
@@ -41,6 +42,11 @@ import use_case.leaderboard.LeaderboardInputBoundary;
 import use_case.leaderboard.LeaderboardInteractor;
 import use_case.leaderboard.LeaderboardOutputBoundary;
 
+import use_case.levelup.LevelUpInteractor;
+import interface_adapter.LevelUp.LevelUpController;
+import interface_adapter.LevelUp.LevelUpPresenter;
+
+import use_case.levelup.LevelUpOutputData;
 import use_case.preferences.PreferencesInputBoundary;
 import use_case.preferences.PreferencesInteractor;
 
@@ -89,6 +95,15 @@ public class AppBuilder {
     private GameState gameState;
     private LoggedInController loggedInController;
 
+    private LevelUpView levelUpView;
+    private LevelUpPresenter levelUpPresenter;
+    private LevelUpController levelUpController;
+    private LevelUpInteractor levelUpInteractor;
+    private LevelUpViewModel levelUpViewModel;
+    private LevelUpOutputData levelUpOutputData;
+
+
+
     public void resetAndRestart() {
         System.out.println("DEBUG: AppBuilder - FULL RESET");
 
@@ -102,11 +117,16 @@ public class AppBuilder {
     private void rebuildCombatStack() {
         System.out.println("DEBUG: AppBuilder - rebuildCombatStack()");
 
+        setupLevelUpStack();
+
         combatViewModel  = new CombatViewModel();
-        combatPresenter  = new CombatPresenter(combatViewModel);
-        combatInteractor = new CombatInteractor(combatPresenter, gameState);
+        combatPresenter  = new CombatPresenter(combatViewModel, levelUpViewModel);
+        combatInteractor = new CombatInteractor(combatPresenter, gameState, levelUpPresenter);
         combatController = new CombatController(combatInteractor);
         combatView       = new CombatView(combatController, combatViewModel);
+
+        levelUpView = new LevelUpView();
+        levelUpView.setController(levelUpController);
 
         // Combat -> Question köprüsü
         if (gameplayView != null) {
@@ -155,6 +175,12 @@ public class AppBuilder {
             gov.display();
         });
 
+        combatPresenter.setLevelUpCallback(() -> {
+            combatView.setVisible(false);
+            // When combat presenter detects a level-up, show the LevelUpView
+            levelUpView.setVisible(true);
+            combatInteractor.resumeBattleAfterLevelUp();
+        });
     }
 
     public AppBuilder addHomeScreenView() {
@@ -324,6 +350,33 @@ public class AppBuilder {
         leaderboardView.display();
 
         return this;
+    }
+
+    private void setupLevelUpStack() {
+        // 1. ViewModel
+        levelUpViewModel = new LevelUpViewModel();
+
+        // 2. Presenter
+        levelUpPresenter = new LevelUpPresenter(levelUpViewModel);
+
+        // 3. Interactor
+        levelUpInteractor = new LevelUpInteractor(gameState.getPlayer(), levelUpPresenter);
+
+        // 4. Controller
+        levelUpController = new LevelUpController(levelUpInteractor);
+
+        // 5. View
+        levelUpView = new LevelUpView();
+        levelUpView.setController(levelUpController);
+
+        levelUpPresenter.setViewCallback(levelUpView);
+
+        // 6. Hook callback to resume combat after leveling
+        levelUpInteractor.setLevelUpFinishedCallback(() -> {
+            levelUpView.setVisible(false);
+            combatView.setVisible(true);
+
+        });
     }
 
     public void build() {

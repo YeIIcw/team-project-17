@@ -5,6 +5,8 @@ import entity.Character;
 import entity.Combatant;
 import entity.Enemy;
 import entity.GameState;
+import interface_adapter.LevelUp.LevelUpPresenter;
+import use_case.levelup.LevelUpOutputData;
 
 import java.util.Random;
 
@@ -18,10 +20,13 @@ public class CombatInteractor implements CombatInputBoundary {
 
     private String pendingActionType;
     private int pendingEnemyDamage;
+    private boolean lvledUp;
+    private final LevelUpPresenter levelUpPresenter;
 
-    public CombatInteractor(CombatOutputBoundary presenter, GameState gameState) {
+    public CombatInteractor(CombatOutputBoundary presenter, GameState gameState, LevelUpPresenter levelUpPresenter) {
         this.presenter = presenter;
         this.gameState = gameState;
+        this.levelUpPresenter = levelUpPresenter;
         this.battle = null;
         this.pendingActionType = null;
         this.pendingEnemyDamage = 0;
@@ -49,7 +54,8 @@ public class CombatInteractor implements CombatInputBoundary {
                 null,
                 null,
                 null,
-                0
+                0,
+                false
         );
         presenter.present(out);
     }
@@ -76,7 +82,8 @@ public class CombatInteractor implements CombatInputBoundary {
                 difficulty,
                 pendingActionType,
                 null,
-                0
+                0,
+                false
         );
         presenter.present(out);
     }
@@ -149,7 +156,8 @@ public class CombatInteractor implements CombatInputBoundary {
                 null,
                 pendingActionType,
                 null,
-                pendingEnemyDamage
+                pendingEnemyDamage,
+                false
         );
         presenter.present(out);
     }
@@ -216,7 +224,8 @@ public class CombatInteractor implements CombatInputBoundary {
                 null,
                 pendingActionType,
                 defenseType,
-                0
+                0,
+                false
         );
         presenter.present(out);
     }
@@ -240,6 +249,16 @@ public class CombatInteractor implements CombatInputBoundary {
         if (battle.isPlayerWon()) {
             int xpGain = 20 + gameState.getEnemyIndex() * 10;
             gameState.addXP(xpGain);
+
+            if (gameState.getXP() >= gameState.nextXP()) {
+                gameState.setXP(gameState.getXP() - gameState.nextXP());
+                lvledUp = true;
+
+                // Trigger LevelUp flow via presenter
+                presenter.playerReadyToLevel(gameState.getPlayer().getHealth(),
+                        gameState.getPlayer().getDamage());
+            }
+
             gameState.incrementEnemiesDefeated();
             gameState.nextEnemy();
             gameState.resetPlayerHealth();
@@ -262,7 +281,8 @@ public class CombatInteractor implements CombatInputBoundary {
                     null,
                     null,
                     defenseType,
-                    0
+                    0,
+                    lvledUp
             );
             presenter.present(out);
             return;
@@ -282,10 +302,35 @@ public class CombatInteractor implements CombatInputBoundary {
                     null,
                     actionType,
                     defenseType,
-                    0
+                    0, false
             );
             presenter.present(out);
         }
+    }
+
+    public void resumeBattleAfterLevelUp() {
+        // Reset lvledUp flag
+        lvledUp = false;
+
+        // Prepare for next player turn
+        Combatant player = battle.getPlayer();
+        Combatant enemy = battle.getOpponent();
+
+        CombatOutputData out = new CombatOutputData(
+                player.getHealth(),
+                enemy.getHealth(),
+                battle.isOngoing(),
+                battle.isPlayerWon(),
+                battle.isPlayerLost(),
+                0, 0, 0,
+                "PLAYER_ACTION_CHOICE",
+                null,
+                null,
+                null,
+                0,
+                false
+        );
+        presenter.present(out);
     }
 
     private String getPlayerActionDifficulty(String actionType) {
