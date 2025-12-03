@@ -7,7 +7,7 @@ import use_case.levelup.LevelUpOutputData;
 public class LevelUpPresenter implements LevelUpOutputBoundary {
     private final LevelUpViewModel viewModel;
     private LevelUpViewCallback callback; // the view registers itself
-    private Runnable onLevelUpFinished;
+    public Runnable onLevelUpFinished;
 
     public LevelUpPresenter(LevelUpViewModel vm) {
         this.viewModel = vm;

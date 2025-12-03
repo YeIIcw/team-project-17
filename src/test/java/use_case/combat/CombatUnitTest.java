@@ -4,6 +4,8 @@ import entity.Character;
 import entity.Enemy;
 import entity.GameState;
 import org.junit.jupiter.api.Test;
+import use_case.levelup.LevelUpOutputBoundary;
+import use_case.levelup.LevelUpOutputData;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,6 +18,31 @@ class CombatUnitTest {
         @Override
         public void present(CombatOutputData outputData) {
             this.lastOutput = outputData;
+        }
+
+        @Override
+        public void playerReadyToLevel(int health, int damage) {
+
+        }
+    }
+
+    private static class FakeLevelUpPresenter implements LevelUpOutputBoundary {
+
+        boolean presentUpdatedStatsCalled = false;
+        boolean levelUpCompleteCalled = false;
+
+        LevelUpOutputData data;
+
+        @Override
+        public void presentUpdatedStats(LevelUpOutputData outputData) {
+            presentUpdatedStatsCalled = true;
+            this.data = outputData;
+        }
+
+        @Override
+        public void levelUpComplete(LevelUpOutputData outputData) {
+            levelUpCompleteCalled = true;
+            this.data = outputData;
         }
     }
 
@@ -79,7 +106,8 @@ class CombatUnitTest {
 
         FakeGameState gameState = new FakeGameState(player, enemy);
         FakePresenter presenter = new FakePresenter();
-        CombatInteractor interactor = new CombatInteractor(presenter, gameState);
+        FakeLevelUpPresenter levelUpPresenter = new FakeLevelUpPresenter();
+        CombatInteractor interactor = new CombatInteractor(presenter, gameState, levelUpPresenter);
 
         interactor.startBattle();
         CombatOutputData out = presenter.lastOutput;

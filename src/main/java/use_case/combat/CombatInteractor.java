@@ -6,6 +6,7 @@ import entity.Combatant;
 import entity.Enemy;
 import entity.GameState;
 import interface_adapter.LevelUp.LevelUpPresenter;
+import use_case.levelup.LevelUpOutputBoundary;
 import use_case.levelup.LevelUpOutputData;
 
 import java.util.Random;
@@ -21,9 +22,9 @@ public class CombatInteractor implements CombatInputBoundary {
     private String pendingActionType;
     private int pendingEnemyDamage;
     private boolean lvledUp;
-    private final LevelUpPresenter levelUpPresenter;
+    private final LevelUpOutputBoundary levelUpPresenter;
 
-    public CombatInteractor(CombatOutputBoundary presenter, GameState gameState, LevelUpPresenter levelUpPresenter) {
+    public CombatInteractor(CombatOutputBoundary presenter, GameState gameState, LevelUpOutputBoundary levelUpPresenter) {
         this.presenter = presenter;
         this.gameState = gameState;
         this.levelUpPresenter = levelUpPresenter;
