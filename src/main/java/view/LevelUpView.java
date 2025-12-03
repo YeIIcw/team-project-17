@@ -15,8 +15,9 @@ public class LevelUpView extends JFrame implements LevelUpViewCallback {
 
     public LevelUpView() {
         super("Level Up");
-        healthLabel = new JLabel("Health: 0");
-        damageLabel = new JLabel("Damage: 0");
+        healthLabel = new JLabel("Health: ");
+        damageLabel = new JLabel("Damage: ");
+        JLabel titleLabel = new JLabel("LEVEL UP!");
         JButton healthButton = new JButton("Increase Health");
         JButton damageButton = new JButton("Increase Damage");
 
@@ -30,8 +31,9 @@ public class LevelUpView extends JFrame implements LevelUpViewCallback {
 
         // Layout
         setLayout(new GridLayout(4, 1));
-        add(healthLabel);
-        add(damageLabel);
+//        add(healthLabel);
+//        add(damageLabel);
+        add(titleLabel);
         add(healthButton);
         add(damageButton);
 

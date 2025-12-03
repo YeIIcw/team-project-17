@@ -11,13 +11,19 @@ public class LevelUpController {
         this.interactor = interactor;
     }
 
+    /**
+     * Handles the player choosing to increase their health during a level-up.
+     */
     public void chooseHealth() {
-        LevelUpInputData inputData = new LevelUpInputData("health");
+        final LevelUpInputData inputData = new LevelUpInputData("health");
         interactor.levelUp(inputData);
     }
 
+    /**
+     * Handles the player choosing to increase their damage during a level-up.
+     */
     public void chooseDamage() {
-        LevelUpInputData inputData = new LevelUpInputData("damage");
+        final LevelUpInputData inputData = new LevelUpInputData("damage");
         interactor.levelUp(inputData);
     }
 }

@@ -1,18 +1,26 @@
 package interface_adapter.LevelUp;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class LevelUpViewModel {
 
     private int health;
     private int damage;
 
-    public void setStats(int health, int damage) {
-        this.health = health;
-        this.damage = damage;
+    /**
+     * Updates the character's health and damage stats in the view model.
+     *
+     * @param newHealth the new health value to set
+     * @param newDamage the new damage value to set
+     */
+    public void setStats(int newHealth, int newDamage) {
+        this.health = newHealth;
+        this.damage = newDamage;
     }
 
-    public int getHealth() { return health; }
-    public int getDamage() { return damage; }
+    public int getHealth() {
+        return health;
+    }
+
+    public int getDamage() {
+        return damage;
+    }
 }

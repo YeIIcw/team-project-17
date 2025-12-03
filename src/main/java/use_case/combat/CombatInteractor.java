@@ -1,14 +1,13 @@
 package use_case.combat;
 
+import java.util.Random;
+
 import entity.Battle;
 import entity.Character;
 import entity.Combatant;
 import entity.Enemy;
 import entity.GameState;
-import interface_adapter.LevelUp.LevelUpPresenter;
-import use_case.levelup.LevelUpOutputData;
-
-import java.util.Random;
+import use_case.levelup.LevelUpOutputBoundary;
 
 public class CombatInteractor implements CombatInputBoundary {
 
@@ -21,9 +20,9 @@ public class CombatInteractor implements CombatInputBoundary {
     private String pendingActionType;
     private int pendingEnemyDamage;
     private boolean lvledUp;
-    private final LevelUpPresenter levelUpPresenter;
+    private final LevelUpOutputBoundary levelUpPresenter;
 
-    public CombatInteractor(CombatOutputBoundary presenter, GameState gameState, LevelUpPresenter levelUpPresenter) {
+    public CombatInteractor(CombatOutputBoundary presenter, GameState gameState, LevelUpOutputBoundary levelUpPresenter) {
         this.presenter = presenter;
         this.gameState = gameState;
         this.levelUpPresenter = levelUpPresenter;
@@ -34,14 +33,14 @@ public class CombatInteractor implements CombatInputBoundary {
 
     @Override
     public void startBattle() {
-        Character player = gameState.getPlayer();
-        Enemy enemy = gameState.getCurrentEnemy();
+        final Character player = gameState.getPlayer();
+        final Enemy enemy = gameState.getCurrentEnemy();
 
         battle = new Battle(player, enemy);
         pendingActionType = null;
         pendingEnemyDamage = 0;
 
-        CombatOutputData out = new CombatOutputData(
+        final CombatOutputData out = new CombatOutputData(
                 player.getHealth(),
                 enemy.getHealth(),
                 true,
@@ -67,9 +66,9 @@ public class CombatInteractor implements CombatInputBoundary {
         }
 
         pendingActionType = inputData.getActionType();
-        String difficulty = getPlayerActionDifficulty(pendingActionType);
+        final String difficulty = getPlayerActionDifficulty(pendingActionType);
 
-        CombatOutputData out = new CombatOutputData(
+        final CombatOutputData out = new CombatOutputData(
                 battle.getPlayer().getHealth(),
                 battle.getOpponent().getHealth(),
                 battle.isOngoing(),

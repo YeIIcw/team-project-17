@@ -8,7 +8,6 @@ public class LevelUpInteractor implements LevelUpInputBoundary {
 
     private Runnable levelUpFinishedCallback;
 
-
     public LevelUpInteractor(Character player, LevelUpOutputBoundary presenter) {
         this.player = player;
         this.presenter = presenter;
@@ -20,7 +19,7 @@ public class LevelUpInteractor implements LevelUpInputBoundary {
 
     @Override
     public void levelUp(LevelUpInputData inputData) {
-        String stat = inputData.getStatToIncrease();
+        final String stat = inputData.getStatToIncrease();
 
         switch (stat.toLowerCase()) {
             case "health":
@@ -29,9 +28,11 @@ public class LevelUpInteractor implements LevelUpInputBoundary {
             case "damage":
                 player.increaseDamage();
                 break;
+            default:
+                break;
         }
 
-        LevelUpOutputData outputData = new LevelUpOutputData(
+        final LevelUpOutputData outputData = new LevelUpOutputData(
                 player.getHealth(),
                 player.getDamage()
         );
