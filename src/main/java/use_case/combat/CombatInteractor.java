@@ -1,15 +1,13 @@
 package use_case.combat;
 
+import java.util.Random;
+
 import entity.Battle;
 import entity.Character;
 import entity.Combatant;
 import entity.Enemy;
 import entity.GameState;
-import interface_adapter.LevelUp.LevelUpPresenter;
 import use_case.levelup.LevelUpOutputBoundary;
-import use_case.levelup.LevelUpOutputData;
-
-import java.util.Random;
 
 public class CombatInteractor implements CombatInputBoundary {
 
@@ -35,14 +33,14 @@ public class CombatInteractor implements CombatInputBoundary {
 
     @Override
     public void startBattle() {
-        Character player = gameState.getPlayer();
-        Enemy enemy = gameState.getCurrentEnemy();
+        final Character player = gameState.getPlayer();
+        final Enemy enemy = gameState.getCurrentEnemy();
 
         battle = new Battle(player, enemy);
         pendingActionType = null;
         pendingEnemyDamage = 0;
 
-        CombatOutputData out = new CombatOutputData(
+        final CombatOutputData out = new CombatOutputData(
                 player.getHealth(),
                 enemy.getHealth(),
                 true,
@@ -68,9 +66,9 @@ public class CombatInteractor implements CombatInputBoundary {
         }
 
         pendingActionType = inputData.getActionType();
-        String difficulty = getPlayerActionDifficulty(pendingActionType);
+        final String difficulty = getPlayerActionDifficulty(pendingActionType);
 
-        CombatOutputData out = new CombatOutputData(
+        final CombatOutputData out = new CombatOutputData(
                 battle.getPlayer().getHealth(),
                 battle.getOpponent().getHealth(),
                 battle.isOngoing(),
